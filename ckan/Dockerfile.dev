@@ -34,8 +34,27 @@ FROM ckan/ckan-dev:2.11
 # Clone the extension(s) your are writing for your own project in the `src` folder
 # to get them mounted in this image at runtime
 
-# ckanext-blind_review
-RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git#egg=ckanext-blind_review
+
+############################ Extensions used by EnviDat CKAN ###########################
+
+# Blind Review
+RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
+
+# TODO fix
+# Passwordless API
+# RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@ckan2.11_py3.10#egg=ckanext-passwordless_api
+# RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
+
+# TODO implement after Passwordless API works for logging in
+# Scheming
+# RUN pip3 install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
+
+# TODO possible remove
+# Envidat theme (has schemas used for ckanext-scheming)
+# RUN pip install git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git
+
+########################################################################################
+
 
 # Copy custom initialization scripts
 COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
