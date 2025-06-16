@@ -29,7 +29,8 @@
 
 ## NOTICE
 This EnviDat customized backend is a **modified copy** of the [ckan-docker](https://github.com/ckan/ckan-docker) repository. 
-EnviDat modifications start after tag 0.1.0. 
+
+**EnviDat modifications start after tag 0.1.0.** 
 
 
 ## 1.  Overview
