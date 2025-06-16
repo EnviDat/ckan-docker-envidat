@@ -7,7 +7,18 @@ volumes:
   local_bin:
   home_dir:
 
+networks:
+  ckan-internal-2.11:
+    name: ckan-2.11
+
 services:
+#
+#  # Email service used for local development and testing
+#  mail:
+#    image: mailhog/mailhog
+#    ports:
+#      - "8025:8025"   # Web UI
+#      - "1025:1025"   # SMTP port
 
   ckan-dev:
     build:
@@ -21,6 +32,7 @@ services:
       - db
       - solr
       - redis
+#      - mail  # Link to email service used for local development
     ports:
       - "0.0.0.0:${CKAN_PORT_HOST}:5000"
     volumes:
@@ -30,6 +42,10 @@ services:
       - site_packages:/usr/local/lib/python3.10/site-packages
       - local_bin:/usr/local/bin
       - home_dir:/srv/app/
+    networks:
+      - ckan-internal-2.11
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000"]
@@ -45,6 +61,8 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
+    networks:
+      - ckan-internal-2.11
 
   db:
     build:
@@ -61,6 +79,8 @@ services:
       - DATASTORE_DB
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      - ckan-internal-2.11
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
@@ -69,12 +89,16 @@ services:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     volumes:
       - solr_data:/var/solr
+    networks:
+      - ckan-internal-2.11
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
 
   redis:
     image: redis:${REDIS_VERSION}
+    networks:
+      - ckan-internal-2.11
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
