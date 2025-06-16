@@ -40,22 +40,28 @@ FROM ckan/ckan-dev:2.11
 # Blind Review
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
 
-# TODO test with SMTP server
 # Passwordless API
 RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
+
+# TODO test
+# Cloud storage
+RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@master#egg=ckanext-cloudstorage
+
+# TODO implement
+# Scheming
+RUN pip3 install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
+
+# TODO implement
+# Envidat theme (has schemas used for ckanext-scheming)
+WORKDIR /srv/app/src
+RUN git clone --branch ckan-2-11 https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git /srv/app/src/ckanext-envidat_theme
+RUN pip install -e /srv/app/src/ckanext-envidat_theme
+#RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@master#egg=ckanext-envidat_theme
+# RUN pip install git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
 
 # TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
 # RUN pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
 #    pip3 install -r ${APP_DIR}/src/ckanext-hierarchy/requirements.txt
-
-# TODO implement
-# Scheming
-# RUN pip3 install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
-
-# TODO implement
-# Envidat theme (has schemas used for ckanext-scheming)
-# RUN pip install git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@master#egg=ckanext-envidat_theme
-# RUN pip install git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
 
 ########################################################################################
 
