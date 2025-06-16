@@ -42,7 +42,7 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git
 
 # TODO test with SMTP server
 # Passwordless API
-# RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
+RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
 # TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
 # RUN pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
