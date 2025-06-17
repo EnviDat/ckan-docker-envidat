@@ -37,31 +37,33 @@ FROM ckan/ckan-dev:2.11
 
 ############################ Extensions used by EnviDat CKAN ###########################
 
-# Blind Review
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
-
-# Passwordless API
+# ckanext-passwordless_api
 RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
-# TODO test
-# Cloud storage
-RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@master#egg=ckanext-cloudstorage
-
 # TODO implement
-# Scheming
+# ckanext-scheming
 RUN pip3 install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
 
 # TODO implement
-# Envidat theme (has schemas used for ckanext-scheming)
+# ckanext-envidat_theme (has schemas used by ckanext-scheming)
 WORKDIR /srv/app/src
 RUN git clone --branch ckan-2-11 https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git /srv/app/src/ckanext-envidat_theme
 RUN pip install -e /srv/app/src/ckanext-envidat_theme
-#RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@master#egg=ckanext-envidat_theme
-# RUN pip install git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
+
+# TODO test
+# ckanext-composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
+RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@master#egg=ckanext-composite
 
 # TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
 # RUN pip3 install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
 #    pip3 install -r ${APP_DIR}/src/ckanext-hierarchy/requirements.txt
+
+# TODO implement, add configuration settings
+# ckanext-cloudstorage
+# RUN pip3 install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@master#egg=ckanext-cloudstorage
+
+# ckanext-blind_review
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
 
 ########################################################################################
 
