@@ -57,15 +57,25 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 USER ckan
 
+# TODO remove "-e" editable mode from installs and retest
+
 # passwordless_api
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
 # scheming
 RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
 
-# TODO implement
-# envidat_theme (has schemas used by ckanext-scheming)
+# TODO possibly deprecate EnviDat ckanext-hierarchy extension
+# hierarchy (used by ckanext-envidat_theme)
+RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy
+#RUN git clone https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-hierarchy.git /srv/app/src/ckanext-hierarchy
+#RUN pip install -e /srv/app/src/ckanext-hierarchy
+#RUN pip install -r /srv/app/src/ckanext-hierarchy/requirements.txt
+
+# Set the working directory to ensure that cloned projects are in "/srv/app/src" directory
 WORKDIR /srv/app/src
+
+# envidat_theme (has schemas used by ckanext-scheming)
 RUN git clone --branch ckan-2-11 https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git /srv/app/src/ckanext-envidat_theme
 RUN pip install -e /srv/app/src/ckanext-envidat_theme
 
@@ -75,13 +85,13 @@ RUN pip install -e /srv/app/src/ckanext-envidat_theme
 # RUN pip install -e /srv/app/src/ckanext-spatial
 # RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 
-# spatial
-RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@master#egg=ckanext-spatial
-RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
-
 # TODO test
 # composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@master#egg=ckanext-composite
+
+# spatial
+RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@master#egg=ckanext-spatial
+RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 
 # TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
 # RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
