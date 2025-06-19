@@ -7,12 +7,14 @@ volumes:
   local_bin:
   home_dir:
 
+# TODO investigate if network is needed
 networks:
   ckan-internal-2.11:
     name: ckan-2.11
 
 services:
-#
+
+  # TODO remove
 #  # Email service used for local development and testing
 #  mail:
 #    image: mailhog/mailhog
@@ -44,6 +46,7 @@ services:
       - home_dir:/srv/app/
     networks:
       - ckan-internal-2.11
+    # TODO review and remove
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -84,11 +87,18 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
-     
+
   solr:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
+    ports:
+      - "8983:8983"
     volumes:
       - solr_data:/var/solr
+      # TODO remove
+      # Bind mount the solr schema from ckan-docker-envidat to the solr service
+      # - ./config/solr/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/schema.xml:ro
+      # Bind mount the solr schema from ckanext/envidat_theme
+    #  - /srv/app/src/ckanext-envidat_theme/ckanext/envidat_theme/config/solr:/opt/solr/server/solr/configsets/ckan/conf:ro
     networks:
       - ckan-internal-2.11
     restart: unless-stopped
