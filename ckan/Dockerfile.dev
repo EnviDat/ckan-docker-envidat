@@ -57,8 +57,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 USER ckan
 
-# TODO remove "-e" editable mode from installs and retest
-
 # passwordless_api
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
@@ -71,6 +69,9 @@ RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=
 #RUN git clone https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-hierarchy.git /srv/app/src/ckanext-hierarchy
 #RUN pip install -e /srv/app/src/ckanext-hierarchy
 #RUN pip install -r /srv/app/src/ckanext-hierarchy/requirements.txt
+# TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
+# RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
+#    pip install -r ${APP_DIR}/src/ckanext-hierarchy/requirements.txt
 
 # Set the working directory to ensure that cloned projects are in "/srv/app/src" directory
 WORKDIR /srv/app/src
@@ -92,9 +93,9 @@ RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 # composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@master#egg=ckanext-composite
 
-# TODO possibly remove as functionality used has been replaced in ckanext-envidat_theme.git@ckan-2-11
-# RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git#egg=ckanext-hierarchy && \
-#    pip install -r ${APP_DIR}/src/ckanext-hierarchy/requirements.txt
+# TODO test
+# restricted
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@ckan-2-11#egg=ckanext-restricted
 
 # TODO implement and test, add configuration settings
 # cloudstorage
