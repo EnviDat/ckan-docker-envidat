@@ -1,3 +1,4 @@
+# TODO remove unused volumes
 volumes:
   ckan_storage:
   pg_data:
@@ -56,6 +57,7 @@ services:
       timeout: 10s
       retries: 3
 
+  # TODO investigate what this extension does
   datapusher:
     image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
     restart: unless-stopped
@@ -90,15 +92,8 @@ services:
 
   solr:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
-    ports:
-      - "8983:8983"
     volumes:
       - solr_data:/var/solr
-      # TODO remove
-      # Bind mount the solr schema from ckan-docker-envidat to the solr service
-      # - ./config/solr/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/schema.xml:ro
-      # Bind mount the solr schema from ckanext/envidat_theme
-    #  - /srv/app/src/ckanext-envidat_theme/ckanext/envidat_theme/config/solr:/opt/solr/server/solr/configsets/ckan/conf:ro
     networks:
       - ckan-internal-2.11
     restart: unless-stopped
