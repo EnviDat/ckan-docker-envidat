@@ -1,5 +1,7 @@
 FROM ckan/ckan-dev:2.11.3
 
+
+
 # TODO remove unused extensions
 # Install any extensions needed by your CKAN instance
 # - Make sure to add the plugins to CKAN__PLUGINS in the .env file
@@ -77,8 +79,6 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # blind_review
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
-
-USER ckan
 
 ########################################################################################
 
