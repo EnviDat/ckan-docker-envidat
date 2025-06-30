@@ -15,14 +15,6 @@ networks:
 
 services:
 
-  # TODO remove
-#  # Email service used for local development and testing
-#  mail:
-#    image: mailhog/mailhog
-#    ports:
-#      - "8025:8025"   # Web UI
-#      - "1025:1025"   # SMTP port
-
   ckan-dev:
     build:
       context: ckan/
@@ -32,10 +24,8 @@ services:
     env_file:
       - .env
     links:
-      - db
       - solr
       - redis
-#      - mail  # Link to email service used for local development
     ports:
       - "0.0.0.0:${CKAN_PORT_HOST}:5000"
     volumes:
@@ -56,39 +46,6 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
-
-  # TODO investigate what this extension does
-  datapusher:
-    image: ckan/ckan-base-datapusher:${DATAPUSHER_VERSION}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8800"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-    networks:
-      - ckan-internal-2.11
-
-  db:
-    build:
-      context: postgresql/
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - CKAN_DB_USER
-      - CKAN_DB_PASSWORD
-      - CKAN_DB
-      - DATASTORE_READONLY_USER
-      - DATASTORE_READONLY_PASSWORD
-      - DATASTORE_DB
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    networks:
-      - ckan-internal-2.11
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
 
   solr:
     image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
