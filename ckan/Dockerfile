@@ -1,8 +1,49 @@
-FROM ckan/ckan-base:2.11
+FROM ckan/ckan-dev:2.11.3
 
 # Install any extensions needed by your CKAN instance
 # See Dockerfile.dev for more details and examples
 
+# TODO possibly remove installation below after ckanext-spatial is updated
+# Install packages needed by official ckanext-scheming extension
+USER root
+RUN apt-get update && apt-get install -y \
+    libxml2-dev \
+    libxslt1-dev \
+    libgeos-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# passwordless_api
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
+
+# scheming
+RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
+
+# hierarchy (used by ckanext-envidat_theme)
+RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy
+
+# envidat_theme (has schemas used by ckanext-scheming)
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
+
+# spatial (has snippets used by ckanext-envidat_theme)
+RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@master#egg=ckanext-spatial
+RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
+
+# TODO test
+# composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@master#egg=ckanext-composite
+
+# TODO test
+# restricted
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@ckan-2-11#egg=ckanext-restricted
+
+# TODO test add configuration settings
+# cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@ckan-2-11#egg=ckanext-cloudstorage
+
+# blind_review
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
+
+########################################################################################
 # Copy custom initialization scripts
 COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
 
