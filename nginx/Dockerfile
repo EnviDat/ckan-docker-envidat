@@ -9,7 +9,8 @@ RUN apk update --no-cache && \
 COPY setup/nginx.conf ${NGINX_DIR}/nginx.conf
 COPY setup/index.html /usr/share/nginx/html/index.html
 COPY setup/error.html /usr/share/nginx/html/error.html
-COPY setup/default.conf ${NGINX_DIR}/conf.d/
+COPY setup/templates ${NGINX_DIR}/templates
+#COPY setup/default.conf ${NGINX_DIR}/conf.d/
 
 RUN mkdir -p ${NGINX_DIR}/certs
 
@@ -21,4 +22,5 @@ ENTRYPOINT \
     -keyout ${NGINX_DIR}/certs/ckan-local.key \
     -out ${NGINX_DIR}/certs/ckan-local.crt \
     -days 365 && \
+  envsubst '${AUTH_COOKIE_NAME}' < ${NGINX_DIR}/templates/ckan.conf.template > ${NGINX_DIR}/conf.d/default.conf && \
   nginx -g 'daemon off;'
