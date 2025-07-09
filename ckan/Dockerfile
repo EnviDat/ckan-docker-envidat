@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # passwordless_api
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@ckan2.11_py3.10#egg=ckanext-passwordless_api
+#RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
 # scheming
 RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
@@ -42,7 +43,7 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # blind_review
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@ckan-2-11#egg=ckanext_blind_review
-
+RUN chown -R ckan:ckan-sys /srv/app/src
 ########################################################################################
 # Copy custom initialization scripts
 COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
