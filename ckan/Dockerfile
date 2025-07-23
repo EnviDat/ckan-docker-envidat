@@ -26,12 +26,12 @@ RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
 
 # spatial (has snippets used by ckanext-envidat_theme)
-RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@master#egg=ckanext-spatial
+RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@v2.3.1#egg=ckanext-spatial
 RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 
 # TODO test
 # composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@master#egg=ckanext-composite
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@ckan-2-11#egg=ckanext-composite
 
 # TODO test
 # restricted
