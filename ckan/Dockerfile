@@ -17,10 +17,10 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api
 #RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-passwordless_api.git@main#egg=ckanext-passwordless_api
 
 # scheming
-RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@master#egg=ckanext-scheming
+RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@release-3.1.0#egg=ckanext-scheming
 
 # hierarchy (used by ckanext-envidat_theme)
-RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@master#egg=ckanext-hierarchy
+RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@v1.2.2#egg=ckanext-hierarchy
 
 # envidat_theme (has schemas used by ckanext-scheming)
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
