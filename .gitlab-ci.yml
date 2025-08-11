@@ -140,13 +140,10 @@ remote-docker:
     # to avoid using the local cache
     - |
       docker compose --project-name="$APP_NAME" \
-        --file "docker-compose.$CI_COMMIT_REF_NAME.yml" \
         create --force-recreate --pull="always"
     # use docker compose up to start the service on the remote machine
     - |
-      docker compose --project-name="$APP_NAME" \
-        --file "docker-compose.$CI_COMMIT_REF_NAME.yml" \
-        up --detach
+      docker compose --project-name="$APP_NAME" up --detach
 
 # Job for manual deploying of a docker-compose file, to use it's
 # docker images, make sure before you run it that the images referenced
@@ -193,13 +190,10 @@ manual-remote-docker:
     # to avoid using the local cache
     - |
       docker compose --project-name="$APP_NAME" \
-        --file "docker-compose.$CI_COMMIT_REF_NAME.yml" \
         create --force-recreate --pull="always"
     # use docker compose up to start the service on the remote machine
     - |
-      docker compose --project-name="$APP_NAME" \
-        --file "docker-compose.$CI_COMMIT_REF_NAME.yml" \
-        up --detach
+      docker compose --project-name="$APP_NAME" up --detach
 
 build-binary:
   stage: release
