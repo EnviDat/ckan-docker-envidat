@@ -42,7 +42,7 @@ set-vars:
   environment: $CI_COMMIT_REF_NAME
   image: docker.io/alpine:3.15
   script:
-    - echo "$.env" >> build.env
+    - echo "$CKAN_ENV" >> build.env
     - source build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
     # - echo "NAMESPACE=ckan" >> build.env
@@ -119,7 +119,7 @@ remote-docker:
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is  ${CKAN_VERSION}"
     - echo "Going to docker remote ($DEPLOY_HOSTNAME) with file docker-compose.$CI_COMMIT_REF_NAME.yml"
-    - echo "$CKAN_INI" > .env
+    - echo "$CKAN_ENV" > .env
     - echo "Adding SSH Key"
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
@@ -168,7 +168,7 @@ manual-remote-docker:
   variables:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
   before_script:
-    - echo "$CKAN_INI" > .env
+    - echo "$CKAN_ENV" > .env
     - echo "Adding SSH Key"
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
