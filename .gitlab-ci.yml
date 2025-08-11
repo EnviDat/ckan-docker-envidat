@@ -20,7 +20,8 @@ default:
 variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast" ## check if required
   CACHE_COMPRESSION_LEVEL: "fast" ## check if required
-  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
 
 .triggers:
   rules:
