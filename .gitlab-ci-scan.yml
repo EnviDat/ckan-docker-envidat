@@ -6,6 +6,7 @@
     entrypoint: [""]
   variables:
     GIT_STRATEGY: none
+  before_script: []
   script:
     - trivy --version
     - time trivy image --clear-cache
