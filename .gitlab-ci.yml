@@ -45,6 +45,7 @@ set-vars:
   before_script: []
   script:
     - echo "$CKAN_ENV" | grep '^CKAN_VERSION=' >> build.env
+    - . build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
     # - echo "NAMESPACE=ckan" >> build.env
     # - echo CHART_VERSION=$(yq '.version' chart/Chart.yaml) >> build.env
@@ -67,7 +68,9 @@ set-vars:
   script:
     - echo "Check how the filesystem looks like for debugging"
     - ls -a
-    - echo "Build image  ${IMAGE_NAME}"
+    - echo "CKAN_VERSION=$CKAN_VERSION"
+    - echo "CKAN_IMAGE=$CKAN_IMAGE"
+    - echo "CONTEXT_DIR=$CONTEXT_DIR"
     - docker build \
       -t "${IMAGE_NAME}-unverified" \
       -f "${CONTEXT_DIR}/Dockerfile" \
