@@ -43,7 +43,7 @@ set-vars:
   image: docker.io/alpine:3.20
   before_script: []
   script:
-    - echo "$CKAN_ENV" >> build.env
+    - echo "$CKAN_ENV" | grep '^CKAN_VERSION=' >> build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
     # - echo "NAMESPACE=ckan" >> build.env
     # - echo CHART_VERSION=$(yq '.version' chart/Chart.yaml) >> build.env
