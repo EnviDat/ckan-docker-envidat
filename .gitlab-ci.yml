@@ -9,13 +9,6 @@ stages:
   - deploy
   - release
   - manual-deploy
-
-default:
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  before_script:
-    - docker info
   
 variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast" ## check if required
@@ -42,7 +35,6 @@ set-vars:
   stage: .pre
   environment: $CI_COMMIT_REF_NAME
   image: docker.io/alpine:3.20
-  before_script: []
   script:
     - echo "$CKAN_ENV" | grep '^CKAN_VERSION=' >> build.env
     - . build.env
@@ -59,22 +51,49 @@ set-vars:
     reports:
       dotenv: build.env
 
-.build:
-  stage: build
-  needs:
-    - set-vars
-  script:
-    - echo "Check how the filesystem looks like for debugging"
-    - ls -a
-    - echo "CKAN_VERSION=$CKAN_VERSION"
-    - echo "CKAN_IMAGE=$CKAN_IMAGE"
-    - echo "CONTEXT_DIR=$CONTEXT_DIR"
-    - docker build \
-      -t "${IMAGE_NAME}-unverified" \
-      -f "${CONTEXT_DIR}/Dockerfile" \
-      "${CONTEXT_DIR}"
-    - docker push "${IMAGE_NAME}-unverified"
+#.build:
+#  stage: build
+#  image: docker:24.0.5
+#  needs:
+#    - set-vars
+#  services:
+#    - docker:24.0.5-dind
+#  variables:
+#    DOCKER_HOST: tcp://docker:2375
+#    DOCKER_TLS_CERTDIR: ""
+#  tags:
+#    - dind
+#  before_script:
+#    - docker info
+#  script:
+#    - echo "Check how the filesystem looks like for debugging"
+#    - ls -a
+#    - echo "CKAN_VERSION=$CKAN_VERSION"
+#    - echo "CKAN_IMAGE=$CKAN_IMAGE"
+#    - echo "CONTEXT_DIR=$CONTEXT_DIR"
+#    - docker build \
+#      -t "${IMAGE_NAME}-unverified" \
+#      -f "${CONTEXT_DIR}/Dockerfile" \
+#      "${CONTEXT_DIR}"
+#    - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
+
+.build:
+  image: moby/buildkit:rootless
+  stage: build
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+  before_script:
+    - mkdir -p ~/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
+  script:
+    - |
+      buildctl-daemonless.sh build \
+        --frontend dockerfile.v0 \
+        --local context="$CONTEXT_DIR" \
+        --local dockerfile="$CONTEXT_DIR" \
+        --output type=image,name="$IMAGE_NAME",push=true
 
 ckan-build:
   extends:
