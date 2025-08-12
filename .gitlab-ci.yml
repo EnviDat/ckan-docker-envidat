@@ -71,10 +71,7 @@ set-vars:
     - echo "CKAN_VERSION=$CKAN_VERSION"
     - echo "CKAN_IMAGE=$CKAN_IMAGE"
     - echo "CONTEXT_DIR=$CONTEXT_DIR"
-    - docker build \
-      -t "${IMAGE_NAME}-unverified" \
-      -f "${CONTEXT_DIR}/Dockerfile" \
-      "${CONTEXT_DIR}"
+    - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
     - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
 
