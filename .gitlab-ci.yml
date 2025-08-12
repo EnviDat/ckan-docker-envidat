@@ -84,6 +84,7 @@ set-vars:
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+    GIT_STRATEGY: clone
   before_script:
     - mkdir -p ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
