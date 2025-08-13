@@ -55,8 +55,10 @@ set-vars:
   needs:
     - set-vars
   services:
-    - name: docker:24.0.5-dind
-      command: ["--tls=false"]
+    #- name: docker:24.0.5-dind
+    #  command: ["--tls=false"]
+    - image: $CI_REGISTRY/group/project/docker:24.0.5
+      alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -84,7 +86,8 @@ set-vars:
     - echo "CKAN_IMAGE=$CKAN_IMAGE"
     - echo "CONTEXT_DIR=$CONTEXT_DIR"
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
-    - docker push "${IMAGE_NAME}-unverified"
+    #- docker push "${IMAGE_NAME}-unverified"
+    - docker push $CI_REGISTRY/$CONTEXT_DIR/${IMAGE_NAME}-unverified
     #- docker run my-docker-image /script/to/run/tests
 
 #.build:
