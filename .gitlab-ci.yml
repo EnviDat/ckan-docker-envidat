@@ -64,8 +64,18 @@ set-vars:
   tags:
     - dind
   before_script:
-    - echo "Logging in to registry $CI_REGISTRY"
-    - echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - echo "Waiting for Docker daemon..."
+    - until docker info >/dev/null 2>&1; do sleep 1; done
+    # Auth with DOCKER_AUTH_CONFIG if present
+    - |
+      if [ -n "$DOCKER_AUTH_CONFIG" ]; then
+        echo "Using DOCKER_AUTH_CONFIG for authentication"
+        mkdir -p ~/.docker
+        echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+      else
+        echo "Logging in to registry $CI_REGISTRY with provided credentials"
+        echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      fi
     - docker info
   script:
     - echo "Check how the filesystem looks like for debugging"
