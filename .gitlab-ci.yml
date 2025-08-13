@@ -88,7 +88,6 @@ set-vars:
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
     - docker info
     - docker images
-    - docker whoami   # For newer docker versions (plugin) — if not available, use:
     - cat ~/.docker/config.json
     - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
