@@ -88,8 +88,6 @@ set-vars:
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
     - docker info
     - docker images
-    - docker logout "$CI_REGISTRY"
-    - echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker whoami   # For newer docker versions (plugin) — if not available, use:
     - cat ~/.docker/config.json
     - docker push "${IMAGE_NAME}-unverified"
