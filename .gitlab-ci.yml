@@ -13,7 +13,6 @@ stages:
 variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast" ## check if required
   CACHE_COMPRESSION_LEVEL: "fast" ## check if required
-  DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
 
 .triggers:
   rules:
@@ -22,13 +21,13 @@ variables:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
     - if: $CI_COMMIT_REF_NAME == "main"
-      when: always
+      when: on_success
     - if: $CI_COMMIT_REF_NAME == "staging"
-      when: always
+      when: on_success
     - if: $CI_COMMIT_REF_NAME == "dev"
-      when: always      
+      when: on_success
     - if: '$CI_PIPELINE_SOURCE == "web"'
-      when: always
+      when: on_success
 
 set-vars:
   stage: .pre
@@ -56,10 +55,12 @@ set-vars:
   needs:
     - set-vars
   services:
-    - docker:24.0.5-dind
+    - name: docker:24.0.5-dind
+      command: ["--tls=false"]
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
   tags:
     - dind
   before_script:
