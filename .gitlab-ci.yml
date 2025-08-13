@@ -76,6 +76,7 @@ set-vars:
     #    echo "Logging in to registry $CI_REGISTRY with provided credentials"
     #    echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     #  fi
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
     - docker info
   script:
     - echo "Check how the filesystem looks like for debugging"
