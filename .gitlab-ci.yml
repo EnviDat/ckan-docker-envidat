@@ -71,6 +71,7 @@ set-vars:
     - echo "CKAN_VERSION=$CKAN_VERSION"
     - echo "CKAN_IMAGE=$CKAN_IMAGE"
     - echo "CONTEXT_DIR=$CONTEXT_DIR"
+    - mkdir -p /root/.docker
     - echo "$DOCKER_AUTH_CONFIG" > /root/.docker/config.json
     - docker login -u "$IMAGE_REGISTRY_USER" -p "$IMAGE_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
