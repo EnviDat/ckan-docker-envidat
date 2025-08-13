@@ -13,8 +13,7 @@ stages:
 variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast" ## check if required
   CACHE_COMPRESSION_LEVEL: "fast" ## check if required
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
 
 .triggers:
   rules:
