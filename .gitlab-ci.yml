@@ -49,37 +49,37 @@ set-vars:
     reports:
       dotenv: build.env
 
-#.build:
-#  stage: build
-#  image: docker:24.0.5
-#  needs:
-#    - set-vars
-#  services:
-#    - name: docker:24.0.5-dind
-#      command: ["--tls=false"]
-#  variables:
-#    DOCKER_HOST: tcp://docker:2375
-#    DOCKER_TLS_CERTDIR: ""
-#    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
-#  tags:
-#    - dind
-#  before_script:
-#    - echo "Waiting for Docker daemon..."
-#    - until docker info >/dev/null 2>&1; do sleep 1; done
-#    - mkdir -p ~/.docker
-#    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
-#    - docker info
-#  script:
-#    - echo "Check how the filesystem looks like for debugging"
-#    - ls -a
-#    - echo "CKAN_VERSION=$CKAN_VERSION"
-#    - echo "CKAN_IMAGE=$CKAN_IMAGE"
-#    - echo "CONTEXT_DIR=$CONTEXT_DIR"
-#    - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
-#    - docker info
-#    - docker images
-#    - cat ~/.docker/config.json
-#    - docker push "${IMAGE_NAME}-unverified"
+.build:
+  stage: build
+  image: docker:24.0.5
+  needs:
+    - set-vars
+  services:
+    - name: docker:24.0.5-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+  tags:
+    - dind
+  before_script:
+    - echo "Waiting for Docker daemon..."
+    - until docker info >/dev/null 2>&1; do sleep 1; done
+    - mkdir -p ~/.docker
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+    - docker info
+  script:
+    - echo "Check how the filesystem looks like for debugging"
+    - ls -a
+    - echo "CKAN_VERSION=$CKAN_VERSION"
+    - echo "CKAN_IMAGE=$CKAN_IMAGE"
+    - echo "CONTEXT_DIR=$CONTEXT_DIR"
+    - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
+    - docker info
+    - docker images
+    - cat ~/.docker/config.json
+    - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
 
 #.build:
@@ -101,40 +101,40 @@ set-vars:
 #        --local dockerfile="$CONTEXT_DIR" \
 #        --output type=image,name="$IMAGE_NAME",push=true
 
-.build:
-  stage: build
-  needs:
-    - set-vars
-  image:
-    name: gcr.io/kaniko-project/executor:v1.9.1-debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - echo "going to create kaniko config.json for auth for ${INTERNAL_REG} -> '${IMAGE_REGISTRY_USER}' and https://index.docker.io/v1/ -> '${DOCKER_USERNAME}'"
-    - >
-      echo "{\"auths\":{
-      \"${INTERNAL_REG}\":{
-        \"auth\":\"$(printf "%s:%s" "${IMAGE_REGISTRY_USER}" "${IMAGE_REGISTRY_PASS}" | base64 | tr -d '\n')\"
-        },
-        \"https://index.docker.io/v1/\":{
-          \"auth\":\"$(printf "%s:%s" "${DOCKER_USERNAME}" "${DOCKER_TOKEN}" | base64 | tr -d '\n')\"
-        }
-      }}" > /kaniko/.docker/config.json
-  script:
-    - echo "Check how the filesystem looks like for debugging"
-    - ls -a
-    - cat /kaniko/.docker/config.json
-    - nslookup registry-gitlab.wsl.ch
-    - nslookup registry-git.wsl.ch
+#.build:
+#  stage: build
+#  needs:
+#    - set-vars
+#  image:
+#    name: gcr.io/kaniko-project/executor:v1.9.1-debug
+#    entrypoint: [""]
+#  before_script:
+#    - mkdir -p /kaniko/.docker
+#    - echo "going to create kaniko config.json for auth for ${INTERNAL_REG} -> '${IMAGE_REGISTRY_USER}' and https://index.docker.io/v1/ -> '${DOCKER_USERNAME}'"
+#    - >
+#      echo "{\"auths\":{
+#      \"${INTERNAL_REG}\":{
+#        \"auth\":\"$(printf "%s:%s" "${IMAGE_REGISTRY_USER}" "${IMAGE_REGISTRY_PASS}" | base64 | tr -d '\n')\"
+#        },
+#        \"https://index.docker.io/v1/\":{
+#          \"auth\":\"$(printf "%s:%s" "${DOCKER_USERNAME}" "${DOCKER_TOKEN}" | base64 | tr -d '\n')\"
+#        }
+#      }}" > /kaniko/.docker/config.json
+#  script:
+#    - echo "Check how the filesystem looks like for debugging"
+#    - ls -a
+#    - cat /kaniko/.docker/config.json
+#    - nslookup registry-gitlab.wsl.ch
+#    - nslookup registry-git.wsl.ch
 
-    - echo "Build image  ${IMAGE_NAME}"
-    - >
-      /kaniko/executor
-      --force
-      --context "${CONTEXT_DIR}"
-      --dockerfile "${CONTEXT_DIR}/Dockerfile"
-      --destination "${IMAGE_NAME}-unverified"
-      --verbosity debug
+#    - echo "Build image  ${IMAGE_NAME}"
+#    - >
+#      /kaniko/executor
+#      --force
+#      --context "${CONTEXT_DIR}"
+#      --dockerfile "${CONTEXT_DIR}/Dockerfile"
+#      --destination "${IMAGE_NAME}-unverified"
+#      --verbosity debug
 
 
 ckan-build:
