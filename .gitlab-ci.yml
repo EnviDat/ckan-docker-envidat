@@ -87,12 +87,13 @@ set-vars:
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
-    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+    #DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
     GIT_STRATEGY: clone
-  before_script:
-    - mkdir -p ~/.docker
-    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  #before_script:
+  #  - mkdir -p ~/.docker
+  #  - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
   script:
+    - echo "$IMAGE_REGISTRY_PASS" | docker login "$CI_REGISTRY" -u "$IMAGE_REGISTRY_USER" --password-stdin
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
