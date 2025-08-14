@@ -123,6 +123,10 @@ set-vars:
   script:
     - echo "Check how the filesystem looks like for debugging"
     - ls -a
+    - cat /kaniko/.docker/config.json
+    - nslookup registry-gitlab.wsl.ch
+    - nslookup registry-git.wsl.ch
+
     - echo "Build image  ${IMAGE_NAME}"
     - >
       /kaniko/executor
@@ -130,6 +134,7 @@ set-vars:
       --context "${CONTEXT_DIR}"
       --dockerfile "${CONTEXT_DIR}/Dockerfile"
       --destination "${IMAGE_NAME}-unverified"
+      --verbosity debug
 
 
 ckan-build:
