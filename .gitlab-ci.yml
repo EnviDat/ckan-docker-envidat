@@ -49,67 +49,56 @@ set-vars:
     reports:
       dotenv: build.env
 
-.build:
-  stage: build
-  image: docker:24.0.5
-  needs:
-    - set-vars
-  services:
-    - name: docker:24.0.5-dind
-      command: ["--tls=false"]
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
-  tags:
-    - dind
-  before_script:
-    - echo "Waiting for Docker daemon..."
-    - until docker info >/dev/null 2>&1; do sleep 1; done
-    # Auth with DOCKER_AUTH_CONFIG if present
-    #- |
-    #  if [ -n "$DOCKER_AUTH_CONFIG" ]; then
-    #    echo "Using DOCKER_AUTH_CONFIG for authentication"
-    #    mkdir -p ~/.docker
-    #    echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
-    #  else
-    #    echo "Logging in to registry $CI_REGISTRY with provided credentials"
-    #    echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-    #  fi
-    - mkdir -p ~/.docker
-    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
-    - docker info
-  script:
-    - echo "$IMAGE_REGISTRY_PASS" | docker login $CI_REGISTRY -u $IMAGE_REGISTRY_USER --password-stdin
-    - echo "Check how the filesystem looks like for debugging"
-    - ls -a
-    - echo "CKAN_VERSION=$CKAN_VERSION"
-    - echo "CKAN_IMAGE=$CKAN_IMAGE"
-    - echo "CONTEXT_DIR=$CONTEXT_DIR"
-    - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
-    - docker info
-    - docker images
-    - cat ~/.docker/config.json
-    - docker push "${IMAGE_NAME}-unverified"
-    #- docker run my-docker-image /script/to/run/tests
-
 #.build:
-#  image: moby/buildkit
 #  stage: build
+#  image: docker:24.0.5
+#  needs:
+#    - set-vars
+#  services:
+#    - name: docker:24.0.5-dind
+#      command: ["--tls=false"]
 #  variables:
-#    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+#    DOCKER_HOST: tcp://docker:2375
+#    DOCKER_TLS_CERTDIR: ""
 #    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
-#    GIT_STRATEGY: clone
+#  tags:
+#    - dind
 #  before_script:
+#    - echo "Waiting for Docker daemon..."
+#    - until docker info >/dev/null 2>&1; do sleep 1; done
 #    - mkdir -p ~/.docker
 #    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+#    - docker info
 #  script:
-#    - |
-#      buildctl-daemonless.sh build \
-#        --frontend dockerfile.v0 \
-#        --local context="$CONTEXT_DIR" \
-#        --local dockerfile="$CONTEXT_DIR" \
-#        --output type=image,name="$IMAGE_NAME",push=true
+#    - echo "Check how the filesystem looks like for debugging"
+#    - ls -a
+#    - echo "CKAN_VERSION=$CKAN_VERSION"
+#    - echo "CKAN_IMAGE=$CKAN_IMAGE"
+#    - echo "CONTEXT_DIR=$CONTEXT_DIR"
+#    - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
+#    - docker info
+#    - docker images
+#    - cat ~/.docker/config.json
+#    - docker push "${IMAGE_NAME}-unverified"
+    #- docker run my-docker-image /script/to/run/tests
+
+.build:
+  image: moby/buildkit
+  stage: build
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+    GIT_STRATEGY: clone
+  before_script:
+    - mkdir -p ~/.docker
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  script:
+    - |
+      buildctl-daemonless.sh build \
+        --frontend dockerfile.v0 \
+        --local context="$CONTEXT_DIR" \
+        --local dockerfile="$CONTEXT_DIR" \
+        --output type=image,name="$IMAGE_NAME",push=true
 
 ckan-build:
   extends:
