@@ -80,6 +80,7 @@ set-vars:
     - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
     - docker info
   script:
+    - echo "$IMAGE_REGISTRY_PASS" | docker login $CI_REGISTRY -u $IMAGE_REGISTRY_USER --password-stdin
     - echo "Check how the filesystem looks like for debugging"
     - ls -a
     - echo "CKAN_VERSION=$CKAN_VERSION"
