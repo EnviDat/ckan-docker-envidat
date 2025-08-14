@@ -83,7 +83,7 @@ set-vars:
     #- docker run my-docker-image /script/to/run/tests
 
 .build:
-  image: moby/buildkit
+  image:  moby/buildkit:rootless
   stage: build
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
