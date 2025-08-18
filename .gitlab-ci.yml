@@ -203,7 +203,7 @@ remote-docker:
     # use docker compose create to recreate the container and force pulling the latest image
     # to avoid using the local cache
     - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
-      docker compose --project-name=$APP_NAME pull &&
+      USER_DIR=$USER_DIR docker compose --project-name=$APP_NAME pull &&
       docker compose --project-name=$APP_NAME up -d --force-recreate"
 
 # Job for manual deploying of a docker-compose file, to use it's
