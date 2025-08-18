@@ -190,7 +190,6 @@ remote-docker:
     - echo 'IdentityFile ~/.ssh/gitlab' > ~/.ssh/config
     - echo "going to keyscan on HOST ${DEPLOY_HOSTNAME}"
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
   #    - cat ~/.ssh/known_hosts
   script:
     - |
