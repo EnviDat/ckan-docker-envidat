@@ -178,6 +178,7 @@ remote-docker:
     - proxy-retag
   variables:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
+    USER_DIR: "/home/$DEPLOY_SSH_USER"
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is  ${CKAN_VERSION}"
@@ -193,10 +194,8 @@ remote-docker:
   #    - cat ~/.ssh/known_hosts
   script:
     - |
-      USER_DIR=$(echo "/home/$DEPLOY_SSH_USER")
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
       scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
-    - HOME=$USER_DIR
     #- echo "going to docker login with user ${DOCKER_USERNAME}"
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
@@ -227,6 +226,7 @@ manual-remote-docker:
   allow_failure: true    
   variables:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
+    USER_DIR: "/home/$DEPLOY_SSH_USER"
   before_script:
     - echo "$CKAN_ENV" > .env
     - echo "Adding SSH Key"
@@ -238,14 +238,12 @@ manual-remote-docker:
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
 #    - cat ~/.ssh/known_hosts
   script:
-    - USER_DIR=$(echo "/home/$DEPLOY_SSH_USER")
     - echo "Defined USER_DIR ${USER_DIR}"
     - echo "Going to create the config/ckan directory for the .env file"
     - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
     - ls -la
     - echo "Going to copy the local ckan.ini file to ${USER_DIR}/config/ckan/.env"
     - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
-    - HOME=$USER_DIR
     - echo "Going to remotely start the docker-compose.${CI_COMMIT_REF_NAME}.yml on ${DEPLOY_SSH_USER}@${DEPLOY_HOSTNAME}"
     #- echo "going to docker login with user ${DOCKER_USERNAME}"
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
