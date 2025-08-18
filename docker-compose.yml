@@ -36,7 +36,7 @@ services:
       - solrnet
       - redisnet
     env_file:
-      - .env
+      - ./config/ckan/.ckan.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
