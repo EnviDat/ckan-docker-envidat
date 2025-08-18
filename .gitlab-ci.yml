@@ -193,9 +193,11 @@ remote-docker:
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
   #    - cat ~/.ssh/known_hosts
   script:
+    # copying both docker-compose and .env to server to keep some redundancy
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
       scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
+      scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml"
     #- echo "going to docker login with user ${DOCKER_USERNAME}"
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
