@@ -177,7 +177,7 @@ remote-docker:
     - ckan-retag
     - proxy-retag
   variables:
-    DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
+    #DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
     USER_DIR: "/home/$DEPLOY_SSH_USER"
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
@@ -200,12 +200,9 @@ remote-docker:
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
     # to avoid using the local cache
-    - |
-      docker compose --project-name="$APP_NAME" \
-        create --force-recreate --pull="always"
-    # use docker compose up to start the service on the remote machine
-    - |
-      docker compose --project-name="$APP_NAME" up --detach
+    - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
+      docker compose --project-name=$APP_NAME create --force-recreate --pull=always &&
+      docker compose --project-name=$APP_NAME up -d"
 
 # Job for manual deploying of a docker-compose file, to use it's
 # docker images, make sure before you run it that the images referenced
