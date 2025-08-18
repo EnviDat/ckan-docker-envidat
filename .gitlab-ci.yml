@@ -39,6 +39,7 @@ set-vars:
     - echo "$CKAN_ENV" | grep '^NGINX_PORT=' >> build.env
     - echo "$CKAN_ENV" | grep '^SOLR_IMAGE_VERSION=' >> build.env
     - echo "$CKAN_ENV" | grep '^REDIS_VERSION=' >> build.env
+    - echo "$CKAN_ENV" | grep '^TZ=' >> build.env
     - . build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
     # - echo "NAMESPACE=ckan" >> build.env
@@ -207,6 +208,7 @@ remote-docker:
     # use docker compose create to recreate the container and force pulling the latest image
     # to avoid using the local cache
     - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
+      export $(cat build.env | xargs) &&
       docker compose --project-name=$APP_NAME pull &&
       docker compose --project-name=$APP_NAME up -d --force-recreate"
 
