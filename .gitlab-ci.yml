@@ -194,7 +194,8 @@ remote-docker:
   extends:
     - .triggers
   needs:
-    - set-vars
+    - job: set-vars
+      artifacts: true
     - ckan-retag
     - proxy-retag
   variables:
