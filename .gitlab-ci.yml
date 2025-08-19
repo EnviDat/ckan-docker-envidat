@@ -39,6 +39,11 @@ set-vars:
   image: docker.io/alpine:3.20
   script:
     - echo "$CKAN_ENV" | grep '^CKAN_VERSION=' >> build.env
+    - echo "$CKAN_ENV" | grep '^NGINX_PORT_HOST=' >> build.env
+    - echo "$CKAN_ENV" | grep '^NGINX_PORT=' >> build.env
+    - echo "$CKAN_ENV" | grep '^SOLR_IMAGE_VERSION=' >> build.env
+    - echo "$CKAN_ENV" | grep '^REDIS_VERSION=' >> build.env
+    - echo "$CKAN_ENV" | grep '^TZ=' >> build.env
     - . build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
     # - echo "NAMESPACE=ckan" >> build.env
@@ -197,7 +202,7 @@ remote-docker:
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is  ${CKAN_VERSION}"
     - echo "Going to docker remote ($DEPLOY_HOSTNAME) with file docker-compose.yml"
-    - echo "$CKAN_ENV" > .env
+    - echo "$CKAN_ENV" > .ckan.env
     - echo "Adding SSH Key"
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
@@ -207,17 +212,18 @@ remote-docker:
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
   #    - cat ~/.ssh/known_hosts
   script:
-    # copying both docker-compose and .env to server to keep some redundancy
+    # copying both docker-compose and .ckan.env to server to keep some redundancy
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
-      scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
+      scp .ckan.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.ckan.env"
       scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml"
     #- echo "going to docker login with user ${DOCKER_USERNAME}"
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
     # to avoid using the local cache
     - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
-      USER_DIR=$USER_DIR docker compose --project-name=$APP_NAME pull &&
+      export $(cat build.env | xargs) &&
+      docker compose --project-name=$APP_NAME pull &&
       docker compose --project-name=$APP_NAME up -d --force-recreate"
 
 # Job for manual deploying of a docker-compose file, to use it's
