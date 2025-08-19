@@ -221,14 +221,15 @@ remote-docker:
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
     # to avoid using the local cache
-    - ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
-      cd $USER_DIR &&
-      cat > build.env <<'EOF'
-      $BUILD_ENV
-      EOF
-      docker compose --project-name=$APP_NAME --env-file build.env pull &&
-      docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
-      rm build.env"
+    - |
+      ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
+        cd $USER_DIR &&
+        cat > build.env <<'EOF'
+  $BUILD_ENV
+  EOF
+        docker compose --project-name=$APP_NAME --env-file build.env pull &&
+        docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
+        rm build.env"
 
 # Job for manual deploying of a docker-compose file, to use it's
 # docker images, make sure before you run it that the images referenced
