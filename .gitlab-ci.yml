@@ -92,13 +92,13 @@ set-vars:
     #- docker run my-docker-image /script/to/run/tests
 
 build-rootless:
-  image:  moby/buildkit:rootless
+  image: moby/buildkit:rootless
   stage: build
   needs:
     - set-vars
   variables:
-    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
+    BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"    
   before_script:
     - mkdir -p ~/.docker
     - echo "going to create kaniko config.json for auth for ${INTERNAL_REG} -> '${IMAGE_REGISTRY_USER}' and https://index.docker.io/v1/ -> '${DOCKER_USERNAME}'"
@@ -112,13 +112,15 @@ build-rootless:
         }
       }}" > ~/.docker/config.json
   script:
-    - echo "$IMAGE_REGISTRY_PASS" | docker login "$CI_REGISTRY" -u "$IMAGE_REGISTRY_USER" --password-stdin
+    - echo "Going to build ${IMAGE_NAME}"
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
         --local context="${CI_PROJECT_DIR}/ckan-rootless" \
-        --local dockerfile="${CI_PROJECT_DIR}/Dockerfile" \
-        --output type=image,name="${IMAGE_NAME}-unverified",push=true
+        --local dockerfile="$CI_PROJECT_DIR" \
+        --opt filename=Dockerfile \
+        --output type=image,name="${IMAGE_NAME}-unverified",push=true \
+        --progress=plain
 
 #.build:
 #  stage: build
