@@ -218,7 +218,8 @@ remote-docker:
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
       scp .ckan.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
-      scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml"
+      scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml
+      scp build.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/build.env"
     #- echo "going to docker login with user ${DOCKER_USERNAME}"
     #- echo "${DOCKER_TOKEN}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
     # use docker compose create to recreate the container and force pulling the latest image
@@ -226,9 +227,6 @@ remote-docker:
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
         cd $USER_DIR &&
-        cat > build.env <<'EOF'
-        $BUILD_ENV
-        EOF
         docker compose --project-name=$APP_NAME --env-file build.env pull &&
         docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
         rm build.env"
