@@ -91,11 +91,11 @@ set-vars:
     - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
 
-.build-rootless:
+build-rootless:
   image:  moby/buildkit:rootless
   stage: build
   needs:
-  - set-vars 
+    - set-vars
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
