@@ -9,7 +9,11 @@ stages:
   - deploy
   - release
   - manual-deploy
-  
+
+default:  
+  tags:
+    - backend
+
 variables:
   ARTIFACT_COMPRESSION_LEVEL: "fast" ## check if required
   CACHE_COMPRESSION_LEVEL: "fast" ## check if required
@@ -87,24 +91,34 @@ set-vars:
     - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
 
-#.build:
-#  image:  moby/buildkit:rootless
-#  stage: build
-#  variables:
-#    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
-#    #DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
-#    GIT_STRATEGY: clone
-#  #before_script:
-#  #  - mkdir -p ~/.docker
-#  #  - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
-#  script:
-#    - echo "$IMAGE_REGISTRY_PASS" | docker login "$CI_REGISTRY" -u "$IMAGE_REGISTRY_USER" --password-stdin
-#    - |
-#      buildctl-daemonless.sh build \
-#        --frontend dockerfile.v0 \
-#        --local context="$CONTEXT_DIR" \
-#        --local dockerfile="$CONTEXT_DIR" \
-#        --output type=image,name="$IMAGE_NAME",push=true
+build-rootless:
+  image:  moby/buildkit:rootless
+  stage: build
+  needs:
+    - set-vars
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+    CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
+  before_script:
+    - mkdir -p ~/.docker
+    - echo "going to create kaniko config.json for auth for ${INTERNAL_REG} -> '${IMAGE_REGISTRY_USER}' and https://index.docker.io/v1/ -> '${DOCKER_USERNAME}'"
+    - >
+      echo "{\"auths\":{
+      \"${INTERNAL_REG}\":{
+        \"auth\":\"$(printf "%s:%s" "${IMAGE_REGISTRY_USER}" "${IMAGE_REGISTRY_PASS}" | base64 | tr -d '\n')\"
+        },
+        \"https://index.docker.io/v1/\":{
+          \"auth\":\"$(printf "%s:%s" "${DOCKER_USERNAME}" "${DOCKER_TOKEN}" | base64 | tr -d '\n')\"
+        }
+      }}" > ~/.docker/config.json
+  script:
+    - echo "$IMAGE_REGISTRY_PASS" | docker login "$CI_REGISTRY" -u "$IMAGE_REGISTRY_USER" --password-stdin
+    - |
+      buildctl-daemonless.sh build \
+        --frontend dockerfile.v0 \
+        --local context="${CI_PROJECT_DIR}/ckan-rootless" \
+        --local dockerfile="${CI_PROJECT_DIR}/Dockerfile" \
+        --output type=image,name="${IMAGE_NAME}-unverified",push=true
 
 #.build:
 #  stage: build
