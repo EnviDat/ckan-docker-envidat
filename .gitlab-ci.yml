@@ -225,8 +225,8 @@ remote-docker:
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
         cd $USER_DIR &&
         cat > build.env <<'EOF'
-  $BUILD_ENV
-  EOF
+$BUILD_ENV
+EOF
         docker compose --project-name=$APP_NAME --env-file build.env pull &&
         docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
         rm build.env"
