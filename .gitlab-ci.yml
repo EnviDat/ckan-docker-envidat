@@ -57,6 +57,8 @@ set-vars:
   artifacts:
     reports:
       dotenv: build.env
+    paths:
+      - build.env
 
 .build:
   stage: build
