@@ -234,7 +234,7 @@ remote-docker:
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
         cd $USER_DIR &&
-        echo '${DOCKER_TOKEN}' | docker login registry-git.wsl.ch --username '${DOCKER_USERNAME}' --password-stdin &&
+        export DOCKER_AUTH_CONFIG='${DOCKER_AUTH_CONFIG}' &&
         docker compose --project-name=$APP_NAME --env-file build.env pull &&
         docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
         rm build.env"
