@@ -50,7 +50,7 @@ services:
       - site_packages:/usr/lib/python3.10/site-packages
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000/api/action/status_show"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan:5000/api/action/status_show"]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -63,7 +63,7 @@ services:
       - solr_data:/var/solr
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://solr:8983/solr/"]
 
   redis:
     image: redis:${REDIS_VERSION}
