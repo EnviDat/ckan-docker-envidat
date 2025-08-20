@@ -217,6 +217,10 @@ remote-docker:
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
   #    - cat ~/.ssh/known_hosts
   script:
+    - echo "=== build.env (local before scp) ==="
+    - cat build.env
+    - echo "=== .ckan.env (local before scp) ==="
+    - cat .ckan.env
     # copying both docker-compose and .ckan.env to server to keep some redundancy
     - |
       ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
