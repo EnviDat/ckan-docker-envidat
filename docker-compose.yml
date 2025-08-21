@@ -1,6 +1,5 @@
 volumes:
   ckan_storage:
-  pg_data:
   solr_data:
   pip_cache:
   site_packages:
@@ -35,8 +34,8 @@ services:
       - ckannet
       - solrnet
       - redisnet
-    #env_file:
-    #  - ./config/ckan/.env  # this is the one CKAN reads
+    env_file:
+      - ./config/ckan/.env  # this is the one CKAN reads
     #extra_hosts:
     #  - "host.docker.internal:host-gateway"
     depends_on:
