@@ -46,8 +46,6 @@ set-vars:
     - echo "$CKAN_ENV" | grep '^TZ=' >> build.env
     - . build.env
     - "echo APP_NAME=ckan-${CI_COMMIT_REF_NAME} >> build.env"
-    # - echo "NAMESPACE=ckan" >> build.env
-    # - echo CHART_VERSION=$(yq '.version' chart/Chart.yaml) >> build.env
     - "echo CKAN_IMAGE=${INTERNAL_REG}/ckan-docker-envidat/ckan:\
       ${CKAN_VERSION}-${CI_COMMIT_REF_NAME} >> build.env"
     - "echo PROXY_IMAGE=${INTERNAL_REG}/ckan-docker-envidat/proxy:\
@@ -285,44 +283,3 @@ manual-remote-docker:
         docker compose --project-name=$APP_NAME --env-file build.env pull &&
         docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
         rm build.env"
-
-build-binary:
-  stage: release
-  image: docker.io/debian:bookworm
-  rules:
-    - if: $CI_COMMIT_TAG
-  before_script:
-    - apt update && apt install -y curl
-    - curl -LO https://github.com/ajdiaz/bashc/releases/download/5.2.15/bashc
-    - chmod +x bashc
-  script:
-    - ./bashc scripts/envidat-in-a-box.sh envidat
-  after_script:
-    - echo "BIN_JOB_ID=$CI_JOB_ID" >> job.env
-  artifacts:
-    paths:
-      - envidat
-    expire_in: never
-    reports:
-      dotenv: job.env
-
-release-binary:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  needs:
-    - job: build-binary
-      artifacts: true
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - echo "running release_job for $CI_COMMIT_TAG"
-    - echo "Using artifact from job $BIN_JOB_ID"
-  release:
-    name: "Release $CI_COMMIT_TAG"
-    tag_name: "$CI_COMMIT_TAG"
-    description: "$CI_COMMIT_TAG"
-    ref: "$CI_COMMIT_SHA"
-    assets:
-      links:
-        - name: envidat-in-a-box
-          url: $CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/$BIN_JOB_ID/artifacts/raw/envidat
