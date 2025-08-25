@@ -66,8 +66,10 @@ set-vars:
     - name: docker:24.0.5-dind
       command: ["--tls=false"] # try to make it work with tls
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    #DOCKER_HOST: tcp://docker:2375
+    #DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "unix:///runner/services/docker/docker.sock"
+    DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
   tags:
     - dind
