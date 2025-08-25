@@ -37,7 +37,7 @@ set-vars:
   stage: .pre
   environment: $CI_COMMIT_REF_NAME
   image: docker.io/alpine:3.20
-  script:
+  script: #check if echo can be used once to extract strings
     - echo "$CKAN_ENV" | grep '^CKAN_VERSION=' >> build.env
     - echo "$CKAN_ENV" | grep '^NGINX_PORT_HOST=' >> build.env
     - echo "$CKAN_ENV" | grep '^NGINX_PORT=' >> build.env
@@ -50,14 +50,13 @@ set-vars:
       ${CKAN_VERSION}-${CI_COMMIT_REF_NAME} >> build.env"
     - "echo PROXY_IMAGE=${INTERNAL_REG}/ckan-docker-envidat/proxy:\
       nginx-${CI_COMMIT_REF_NAME} >> build.env"
-    - echo "Printing build.env"
-    - cat build.env
   artifacts:
     reports:
       dotenv: build.env
     paths:
       - build.env
 
+#create document to setup dind runner
 .build:
   stage: build
   image: docker:24.0.5
@@ -65,7 +64,7 @@ set-vars:
     - set-vars
   services:
     - name: docker:24.0.5-dind
-      command: ["--tls=false"]
+      command: ["--tls=false"] # try to make it work with tls
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -79,15 +78,10 @@ set-vars:
     - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
     - docker info
   script:
-    - echo "Check how the filesystem looks like for debugging"
-    - ls -a
     - echo "CKAN_VERSION=$CKAN_VERSION"
     - echo "CKAN_IMAGE=$CKAN_IMAGE"
     - echo "CONTEXT_DIR=$CONTEXT_DIR"
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
-    - docker info
-    - docker images
-    - cat ~/.docker/config.json
     - docker push "${IMAGE_NAME}-unverified"
     #- docker run my-docker-image /script/to/run/tests
 
@@ -170,7 +164,7 @@ proxy-build:
   extends:
     - .triggers
     - .build
-  cache:
+  cache: # check if required
     key: nginx-config
     paths:
       - nginx/conf.d/ckan.conf.template
@@ -178,14 +172,6 @@ proxy-build:
   variables:
     IMAGE_NAME: ${PROXY_IMAGE}
     CONTEXT_DIR: "${CI_PROJECT_DIR}/nginx"
-
-#db-build:
-#  extends:
-#    - .triggers
-#    - .build
-#  variables:
-#    IMAGE_NAME: ${DB_IMAGE}
-#    CONTEXT_DIR: "${CI_PROJECT_DIR}/postgresql"
 
 remote-docker:
   stage: deploy
