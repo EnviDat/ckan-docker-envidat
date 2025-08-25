@@ -64,7 +64,7 @@ set-vars:
     - set-vars
   services:
     - name: docker:24.0.5-dind
-      command: ["--tls=false"] # try to make it work with tls
+      #command: ["--tls=false"] # try to make it work with tls
   variables:
     #DOCKER_HOST: tcp://docker:2375
     #DOCKER_TLS_CERTDIR: ""
