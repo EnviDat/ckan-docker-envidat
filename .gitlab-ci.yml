@@ -65,24 +65,24 @@ set-vars:
   services:
     - name: docker:24.0.5-dind
       pull_policy: if-not-present
-      #command: ["--tls=false"] # try to make it work with tls
+      # the following setting is for tls disabled
+      #command: ["--tls=false"]
+      # the following setting is for tls enabled
       command: ["--tls=true", "--host=tcp://0.0.0.0:2376"]
   variables:
+    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+    # the following settings are for tls disabled
     #DOCKER_HOST: tcp://docker:2375
     #DOCKER_TLS_CERTDIR: ""
+    # the following settings are for tls enabled
     DOCKER_HOST: "tcp://docker:2376"
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
     DOCKER_TLS_VERIFY: "1"
-    DOCKER_AUTH_CONFIG: $DOCKER_AUTH_CONFIG
+    
   tags:
     - dind
   before_script:
-    - apk add --no-cache curl
-    - echo "Checking if dind is reachable on 2376..."
-    - curl -vk https://docker:2376 || true
-    - ls -l /certs
-    - ls -l /certs/client
     - echo "Waiting for Docker daemon..."
     - until docker info >/dev/null 2>&1; do sleep 1; done
     - mkdir -p ~/.docker
@@ -94,7 +94,6 @@ set-vars:
     - echo "CONTEXT_DIR=$CONTEXT_DIR"
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
     - docker push "${IMAGE_NAME}-unverified"
-    #- docker run my-docker-image /script/to/run/tests
 
 build-rootless:
   image: moby/buildkit:rootless
