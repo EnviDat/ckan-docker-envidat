@@ -78,6 +78,11 @@ set-vars:
   tags:
     - dind
   before_script:
+    - apk add --no-cache curl
+    - echo "Checking if dind is reachable on 2376..."
+    - curl -vk https://docker:2376 || true
+    - ls -l /certs
+    - ls -l /certs/client
     - echo "Waiting for Docker daemon..."
     - until docker info >/dev/null 2>&1; do sleep 1; done
     - mkdir -p ~/.docker
