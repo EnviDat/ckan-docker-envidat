@@ -115,7 +115,7 @@ set-vars:
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
-        --local context="${CI_PROJECT_DIR}/ckan-rootless" \
+        --local context=. \
         --local dockerfile="$CI_PROJECT_DIR" \
         --opt filename=Dockerfile \
         --output type=image,name="${IMAGE_NAME}-unverified",push=true \
