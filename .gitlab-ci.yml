@@ -94,7 +94,7 @@ set-vars:
     - docker build -t "${IMAGE_NAME}-unverified" -f "${CONTEXT_DIR}/Dockerfile" "${CONTEXT_DIR}"
     - docker push "${IMAGE_NAME}-unverified"
 
-build-rootless:
+.build-rootless:
   image: 
     name: moby/buildkit:rootless
     entrypoint: [""]
