@@ -115,8 +115,8 @@ set-vars:
     - |
       buildctl-daemonless.sh build \
         --frontend dockerfile.v0 \
-        --local context=${CI_PROJECT_DIR} \
-        --local dockerfile=${CI_PROJECT_DIR} \
+        --local context=${CONTEXT_DIR} \
+        --local dockerfile=${CONTEXT_DIR} \
         --output type=image,name="${IMAGE_NAME}-unverified",push=true \
         --progress=plain
 
