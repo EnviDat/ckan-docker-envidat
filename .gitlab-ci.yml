@@ -109,7 +109,15 @@ set-vars:
   before_script:
     - mkdir -p ~/.docker
     - echo "going to create kaniko config.json for auth for ${INTERNAL_REG} -> '${IMAGE_REGISTRY_USER}' and https://index.docker.io/v1/ -> '${DOCKER_USERNAME}'"
-    - echo "$DOCKER_CONFIG_AUTH" > ~/.docker/config.json
+    - >
+      echo "{\"auths\":{
+      \"${INTERNAL_REG}\":{
+        \"auth\":\"$(printf "%s:%s" "${IMAGE_REGISTRY_USER}" "${IMAGE_REGISTRY_PASS}" | base64 | tr -d '\n')\"
+        },
+        \"https://index.docker.io/v1/\":{
+          \"auth\":\"$(printf "%s:%s" "${DOCKER_USERNAME}" "${DOCKER_TOKEN}" | base64 | tr -d '\n')\"
+        }
+      }}" > ~/.docker/config.json
   script:
     - echo "Going to build ${IMAGE_NAME}"
     - |
