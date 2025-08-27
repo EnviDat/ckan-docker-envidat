@@ -107,7 +107,7 @@ set-vars:
     CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
     BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"    
   before_script:
-    - mkdir -p ~/.docker
+    - mkdir -p "$DOCKER_CONFIG"
     - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
   script:
     - echo "Going to build ${IMAGE_NAME}"
