@@ -131,11 +131,6 @@ proxy-build:
   extends:
     - .triggers
     - .build-rootless
-  cache: # check if required
-    key: nginx-config
-    paths:
-      - nginx/conf.d/ckan.conf.template
-    policy: pull
   variables:
     IMAGE_NAME: ${PROXY_IMAGE}
     CONTEXT_DIR: "${CI_PROJECT_DIR}/nginx"
