@@ -131,11 +131,6 @@ proxy-build:
   extends:
     - .triggers
     - .build-rootless
-  cache: # check if required
-    key: nginx-config
-    paths:
-      - nginx/conf.d/ckan.conf.template
-    policy: pull
   variables:
     IMAGE_NAME: ${PROXY_IMAGE}
     CONTEXT_DIR: "${CI_PROJECT_DIR}/nginx"
@@ -152,38 +147,23 @@ remote-docker:
     - ckan-retag
     - proxy-retag
   variables:
-    #DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
-    USER_DIR: /home/$DEPLOY_SSH_USER
+    DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
+    #USER_DIR: /home/$DEPLOY_SSH_USER
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
-    - echo "***The app version is  ${CKAN_VERSION}"
-    - echo "Going to docker remote ($DEPLOY_HOSTNAME) with file docker-compose.yml"
-    - echo "$CKAN_ENV" > .ckan.env
-    - echo "Adding SSH Key"
+    - echo "***The app version is ${CKAN_VERSION}"
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - echo 'IdentityFile ~/.ssh/gitlab' > ~/.ssh/config
-    - echo "going to keyscan on HOST ${DEPLOY_HOSTNAME}"
+    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-  #    - cat ~/.ssh/known_hosts
+    # Provide registry auth for docker on remote host
+    - mkdir -p ~/.docker
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
   script:
-    # copying both docker-compose and .ckan.env to server to keep some redundancy
-    - |
-      ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
-      scp .ckan.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
-      scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml"
-      scp build.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/build.env"
-    # use docker compose create to recreate the container and force pulling the latest image
-    # to avoid using the local cache
-    - |
-      ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
-        mkdir -p ~/.docker &&
-        echo '${DOCKER_AUTH_CONFIG}' > ~/.docker/config.json &&
-        cd $USER_DIR &&
-        docker compose --project-name=$APP_NAME --env-file build.env pull &&
-        docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
-        rm build.env"
+    # All docker commands below run on remote host, thanks to DOCKER_HOST
+    - docker compose --project-name=$APP_NAME --env-file build.env pull
+    - docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate
 
 # Job for manual deploying of a docker-compose file, to use it's
 # docker images, make sure before you run it that the images referenced
