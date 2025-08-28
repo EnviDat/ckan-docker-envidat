@@ -160,15 +160,15 @@ remote-docker:
     - mkdir -p config/ckan
     - echo "$CKAN_ENV" > config/ckan/.env
     - echo "$BUILD_ENV" > build.env
-    # keep remote copy for debugging/auditing (not truly for the deployment)
-    - scp config/ckan/.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/config/ckan/.env"
-
+    
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
     - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
+    # keep remote copy for debugging/auditing (not truly for the deployment)
+    - scp config/ckan/.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/config/ckan/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - echo "$CKAN_ENV" > config/ckan/.env
