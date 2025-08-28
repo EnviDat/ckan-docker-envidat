@@ -153,14 +153,21 @@ remote-docker:
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is ${CKAN_VERSION}"
+    # Create Docker config dir inside job container
+    - mkdir -p "$DOCKER_CONFIG"
+    - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
+
+    # Create CKAN env dir + file inside job container
+    - mkdir -p config/ckan
+    - echo "$CKAN_ENV" > config/ckan/.env
+    - echo "$BUILD_ENV" > build.env
+
+    # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
     - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-    # Provide registry auth for docker on remote host
-    - mkdir -p "$DOCKER_CONFIG"
-    - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - echo "$CKAN_ENV" > config/ckan/.env
