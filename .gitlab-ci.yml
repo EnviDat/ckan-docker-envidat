@@ -148,7 +148,6 @@ remote-docker:
     - proxy-retag
   variables:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
-    USER_DIR: /home/$DEPLOY_SSH_USER
     DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
@@ -161,6 +160,8 @@ remote-docker:
     - mkdir -p config/ckan
     - echo "$CKAN_ENV" > config/ckan/.env
     - echo "$BUILD_ENV" > build.env
+    # keep remote copy for debugging/auditing (not truly for the deployment)
+    - scp config/ckan/.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/config/ckan/.env"
 
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
@@ -191,38 +192,34 @@ manual-remote-docker:
     - if: '$CI_PIPELINE_SOURCE == "parent_pipeline"'
       when: always
     - when: manual
-  # for manaul jobs add allow_failure so the whole pipeline won't show up as "blocked"
+  # for manual jobs add allow_failure so the whole pipeline won't show up as "blocked"
   allow_failure: true    
   variables:
-    #DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
-    USER_DIR: /home/$DEPLOY_SSH_USER
+    DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
+    DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
-    - echo "***The app version is  ${CKAN_VERSION}"
-    - echo "Going to docker remote ($DEPLOY_HOSTNAME) with file docker-compose.yml"
-    - echo "$CKAN_ENV" > .ckan.env
-    - echo "Adding SSH Key"
+    - echo "***The app version is ${CKAN_VERSION}"
+    # Create Docker config dir inside job container
+    - mkdir -p "$DOCKER_CONFIG"
+    - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
+
+    # Create CKAN env dir + file inside job container
+    - mkdir -p config/ckan
+    - echo "$CKAN_ENV" > config/ckan/.env
+    - echo "$BUILD_ENV" > build.env
+    # keep remote copy for debugging/auditing (not truly for the deployment)
+    - scp config/ckan/.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/config/ckan/.env"
+
+    # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
     - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - echo 'IdentityFile ~/.ssh/gitlab' > ~/.ssh/config
-    - echo "going to keyscan on HOST ${DEPLOY_HOSTNAME}"
+    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-#    - cat ~/.ssh/known_hosts
   script:
-    # copying both docker-compose and .ckan.env to server to keep some redundancy
-    - |
-      ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "mkdir -p $USER_DIR/config/ckan"
-      scp .ckan.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/config/ckan/.env"
-      scp docker-compose.yml "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/docker-compose.yml"
-      scp build.env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:$USER_DIR/build.env"
-    # use docker compose create to recreate the container and force pulling the latest image
-    # to avoid using the local cache
-    - |
-      ssh "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "
-        mkdir -p ~/.docker &&
-        echo '${DOCKER_AUTH_CONFIG}' > ~/.docker/config.json &&
-        cd $USER_DIR &&
-        docker compose --project-name=$APP_NAME --env-file build.env pull &&
-        docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate &&
-        rm build.env"
+    # All docker commands below run on remote host, thanks to DOCKER_HOST
+    - echo "$CKAN_ENV" > config/ckan/.env
+    - echo "$BUILD_ENV" > build.env
+    - docker compose --project-name=$APP_NAME --env-file build.env pull
+    - docker compose --project-name=$APP_NAME --env-file build.env up -d --force-recreate
