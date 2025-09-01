@@ -8,28 +8,34 @@
     GIT_STRATEGY: none
   script:
     - trivy --version
-    - time trivy image --clear-cache
+    - trivy clean --scan-cache
     - time trivy --cache-dir .trivycache/ image --download-db-only --no-progress
-    # Run scan once, produce both GitLab JSON + human-readable output
+    # Single scan → JSON only
     - |
       echo "🔍 Scanning image ${IMAGE_NAME}-unverified ..."
       trivy --cache-dir .trivycache/ image \
         --ignore-unfixed \
         --no-progress \
-        --format template --template "@/contrib/gitlab.tpl" \
+        --format json \
         --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json" \
         "${IMAGE_NAME}-unverified" \
         | tee "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.log"
 
-    # Fail job if CRITICAL fixable vulns are found (without re-scan)
+    # Convert JSON to GitLab template format (if you still want GitLab Security Dashboard integration)
+    - trivy convert --format template --template "@/contrib/gitlab.tpl" \
+        --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.gitlab.json" \
+        "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json"
+
+    # Fail job if CRITICAL fixable vulns are found (no re-scan, just parse JSON)
     - |
       echo "🔎 Checking for CRITICAL vulnerabilities..."
-      trivy --cache-dir .trivycache/ image \
-        --ignore-unfixed \
-        --severity CRITICAL \
-        --exit-code 1 \
-        --no-progress \
-        "${IMAGE_NAME}-unverified"
+      if jq -e '.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL")' \
+            "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json" > /dev/null; then
+        echo "❌ CRITICAL vulnerabilities found!"
+        exit 1
+      else
+        echo "✅ No CRITICAL vulnerabilities found."
+      fi
   cache:
     key: trivy-cache
     paths:
