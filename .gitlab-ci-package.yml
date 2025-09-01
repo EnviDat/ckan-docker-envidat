@@ -1,19 +1,20 @@
 .retag:
   stage: package
-  image: docker.io/regclient/regctl:v0.3-alpine
+  image: docker.io/regclient/regctl:v0.9.2-alpine
   variables:
     GIT_STRATEGY: none
+    REGCTL_CONFIG: $CI_PROJECT_DIR/.regctl/config.json
   before_script:
     - export REG_HOST=${INTERNAL_REG%/*}
     - >
       echo "{\"hosts\":{\"${REG_HOST}\":{\"tls\":\"enabled\",\"hostname\":
       \"${REG_HOST}\",\"user\":\"${IMAGE_REGISTRY_USER}\",\"pass\":
-      \"${IMAGE_REGISTRY_PASS}\"}}}" >> /home/appuser/.regctl/config.json
+      \"${IMAGE_REGISTRY_PASS}\"}}}" >> $REGCTL_CONFIG
   script:
     - >
-      regctl --verbosity debug image copy
+      regctl --verbosity info image copy
       "${IMAGE_NAME}-unverified" "${IMAGE_NAME}"
-    - regctl --verbosity debug tag delete "${IMAGE_NAME}-unverified"
+    - regctl tag delete "${IMAGE_NAME}-unverified" || echo "Tag already deleted"
 
 ckan-retag:
   needs:

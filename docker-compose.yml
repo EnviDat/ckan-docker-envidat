@@ -36,8 +36,6 @@ services:
       - redisnet
     env_file:
       - .env  # this is the one CKAN reads
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
     depends_on:
       solr:
         condition: service_healthy

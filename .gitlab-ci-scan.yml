@@ -2,7 +2,7 @@
 .scan:
   stage: scan
   image:
-    name: docker.io/aquasec/trivy:0.23.0
+    name: docker.io/aquasec/trivy:0.65.0
     entrypoint: [""]
   variables:
     GIT_STRATEGY: none
@@ -10,20 +10,26 @@
     - trivy --version
     - time trivy image --clear-cache
     - time trivy --cache-dir .trivycache/ image --download-db-only --no-progress
-    # Create report artifact
-    - >
-      time trivy --cache-dir .trivycache/ image --exit-code 0 --ignore-unfixed
-      --no-progress --format template --template "@/contrib/gitlab.tpl"
-      --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json"
-      "${IMAGE_NAME}-unverified"
-    # Print full report
-    - >
-      time trivy --cache-dir .trivycache/ image --exit-code 0 --ignore-unfixed
-      --no-progress "${IMAGE_NAME}"-unverified
-    # Fail on critical vulnerabilities
-    - >
-      time trivy --cache-dir .trivycache/ image --exit-code 1 --ignore-unfixed
-      --severity CRITICAL --no-progress "${IMAGE_NAME}"-unverified
+    # Run scan once, produce both GitLab JSON + human-readable output
+    - |
+      echo "🔍 Scanning image ${IMAGE_NAME}-unverified ..."
+      trivy --cache-dir .trivycache/ image \
+        --ignore-unfixed \
+        --no-progress \
+        --format template --template "@/contrib/gitlab.tpl" \
+        --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json" \
+        "${IMAGE_NAME}-unverified" \
+        | tee "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.log"
+
+    # Fail job if CRITICAL fixable vulns are found (without re-scan)
+    - |
+      echo "🔎 Checking for CRITICAL vulnerabilities..."
+      trivy --cache-dir .trivycache/ image \
+        --ignore-unfixed \
+        --severity CRITICAL \
+        --exit-code 1 \
+        --no-progress \
+        "${IMAGE_NAME}-unverified"
   cache:
     key: trivy-cache
     paths:
@@ -33,6 +39,8 @@
     when: always
     reports:
       container_scanning: $SHORT_NAME-imgscan.json
+    paths:
+      - $SHORT_NAME-imgscan.log
 
 ckan-scan:
   needs:
@@ -44,7 +52,6 @@ ckan-scan:
   variables:
     IMAGE_NAME: ${CKAN_IMAGE}
     SHORT_NAME: "ckan"
-  allow_failure: true
 
 proxy-scan:
   needs:
