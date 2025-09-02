@@ -17,9 +17,10 @@
         --ignore-unfixed \
         --no-progress \
         --format json \
-        --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json" \
         "${IMAGE_NAME}-unverified" \
-        | tee "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.log"
+        --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json" \
+      | tee "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.log"
+
 
     # Convert JSON to GitLab template format (if you still want GitLab Security Dashboard integration)
     - trivy convert --format template --template "@/contrib/gitlab.tpl" \
