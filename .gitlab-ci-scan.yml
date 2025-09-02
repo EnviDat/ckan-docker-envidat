@@ -23,9 +23,12 @@
 
 
     # Convert JSON to GitLab template format (if you still want GitLab Security Dashboard integration)
-    - trivy convert --format template --template "@/contrib/gitlab.tpl" \
+    - |
+      trivy convert --format template \
+        --template "@/contrib/gitlab.tpl" \
         --output "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.gitlab.json" \
         "$CI_PROJECT_DIR/$SHORT_NAME-imgscan.json"
+
 
     # Fail job if CRITICAL fixable vulns are found (no re-scan, just parse JSON)
     - |
