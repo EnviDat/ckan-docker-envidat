@@ -22,8 +22,9 @@ services:
     ports:
       #- "0.0.0.0:${NGINX_SSLPORT_HOST}:${NGINX_SSLPORT}"
       - "0.0.0.0:${NGINX_PORT_HOST}:${NGINX_PORT}"
-    
+
   ckan:
+    container_name: ckan
     build:
       context: ckan/
       dockerfile: Dockerfile
@@ -70,7 +71,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
-    
+
 networks:
   webnet:
   ckannet:
