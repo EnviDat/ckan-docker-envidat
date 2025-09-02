@@ -6,6 +6,7 @@
     REGCTL_CONFIG: $CI_PROJECT_DIR/.regctl/config.json
   before_script:
     - export REG_HOST=${INTERNAL_REG%/*}
+    - mkdir -p "$(dirname "$REGCTL_CONFIG")"
     - >
       echo "{\"hosts\":{\"${REG_HOST}\":{\"tls\":\"enabled\",\"hostname\":
       \"${REG_HOST}\",\"user\":\"${IMAGE_REGISTRY_USER}\",\"pass\":
