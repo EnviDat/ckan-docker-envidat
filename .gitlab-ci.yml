@@ -96,7 +96,8 @@ set-vars:
 
 .build-rootless:
   image: 
-    name: moby/buildkit:rootless
+    #name: moby/buildkit:rootless
+    name: moby/buildkit:master-rootless
     entrypoint: [""]
   stage: build
   needs:
@@ -105,7 +106,7 @@ set-vars:
     DOCKER_BUILDKIT: 1
     DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
     CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
-    BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"    
+    #BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"    
   before_script:
     - mkdir -p "$DOCKER_CONFIG"
     - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
