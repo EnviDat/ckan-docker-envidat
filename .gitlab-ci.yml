@@ -96,8 +96,7 @@ set-vars:
 
 .build-rootless:
   image: 
-    #name: moby/buildkit:rootless
-    name: moby/buildkit:master-rootless
+    name: moby/buildkit:rootless
     entrypoint: [""]
   stage: build
   needs:
