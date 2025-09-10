@@ -36,6 +36,9 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 # TODO test
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@ckan-2-11-v2#egg=ckanext-restricted
+# Fix permissions for CKAN
+RUN mkdir -p /var/lib/ckan/i18n && \
+    chown -R ckan:ckan-sys /var/lib/ckan
 
 # TODO test add configuration settings
 # cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
