@@ -48,6 +48,9 @@ RUN pip install -r /srv/app/src/ckanext-cloudstorage/requirements.txt
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckanext-blind_review.git@2.0.0#egg=ckanext_blind_review
 RUN chown -R ckan:ckan-sys /srv/app/src
 
+# Build assets for extensions
+RUN ckan asset build
+
 ########################################################################################
 # Copy custom initialization scripts
 COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
