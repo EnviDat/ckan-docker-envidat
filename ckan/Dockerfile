@@ -22,7 +22,7 @@ RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@release-3.1.
 RUN pip install -e git+https://github.com/ckan/ckanext-hierarchy.git@v1.2.2#egg=ckanext-hierarchy
 
 # envidat_theme (has schemas used by ckanext-scheming)
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@ckan-2-11#egg=ckanext-envidat_theme
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-envidat_theme.git@2.0.0#egg=ckanext-envidat_theme
 
 # spatial (has snippets used by ckanext-envidat_theme)
 RUN pip install -e git+https://github.com/ckan/ckanext-spatial.git@v2.3.1#egg=ckanext-spatial
