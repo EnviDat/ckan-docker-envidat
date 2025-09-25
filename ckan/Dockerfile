@@ -30,7 +30,7 @@ RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 
 # TODO test
 # composite (used by "datacite_dataset.json" in ckanext-envidat_theme)
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@ckan-2-11#egg=ckanext-composite
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@0.0.4#egg=ckanext-composite
 
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
@@ -40,7 +40,7 @@ RUN mkdir -p /var/lib/ckan/i18n && \
 
 # TODO test add configuration settings
 # cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@ckan-2-11#egg=ckanext-cloudstorage
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@2.0.0#egg=ckanext-cloudstorage
 RUN pip install -r /srv/app/src/ckanext-cloudstorage/requirements.txt
 
 # blind_review
