@@ -32,7 +32,6 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
-# Fix permissions for CKAN
 RUN mkdir -p /var/lib/ckan/i18n && \
     chown -R ckan:ckan-sys /var/lib/ckan
 
