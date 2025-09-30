@@ -2,9 +2,9 @@
 set -e
 
 # Make sure directory exists
-mkdir -p /var/lib/ckan/i18n
+#mkdir -p /var/lib/ckan/i18n
 # Fix permissions before anything else
-chown -R ckan:ckan /var/lib/ckan
+#chown -R ckan:ckan /var/lib/ckan
 
 ckan asset build
 

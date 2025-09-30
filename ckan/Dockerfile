@@ -32,8 +32,8 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
-#RUN mkdir -p /var/lib/ckan/i18n && \
-#    chown -R ckan:ckan-sys /var/lib/ckan
+RUN mkdir -p /var/lib/ckan/i18n && \
+    chown -R ckan-sys:ckan-sys /var/lib/ckan
 
 # cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@2.0.0#egg=ckanext-cloudstorage
@@ -41,8 +41,7 @@ RUN pip install -r /srv/app/src/ckanext-cloudstorage/requirements.txt
 
 # blind_review
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-blind_review.git@2.0.0#egg=ckanext_blind_review
-RUN chown -R ckan:ckan-sys /srv/app/src
-
+RUN chown -R ckan-sys:ckan-sys /srv/app/src
 ########################################################################################
 # Copy custom initialization scripts
 COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
