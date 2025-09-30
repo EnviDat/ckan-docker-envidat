@@ -1,4 +1,4 @@
-FROM ckan/ckan-dev:2.11.3
+FROM ckan/ckan-base:2.11.3
 
 # Install any extensions needed by your CKAN instance
 # See Dockerfile.dev for more details and examples
