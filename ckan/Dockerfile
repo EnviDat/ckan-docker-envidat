@@ -32,8 +32,8 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
-RUN mkdir -p /var/lib/ckan/i18n && \
-    chown -R ckan:ckan-sys /var/lib/ckan
+#RUN mkdir -p /var/lib/ckan/i18n && \
+#    chown -R ckan:ckan-sys /var/lib/ckan
 
 # cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-cloudstorage@2.0.0#egg=ckanext-cloudstorage
