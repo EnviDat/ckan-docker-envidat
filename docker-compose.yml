@@ -31,6 +31,8 @@ services:
       dockerfile: Dockerfile
       args:
         - TZ=${TZ}
+        - "UID=${UID:-1000}"
+        - "GID=${GID:-1000}"
     networks:
       - ckannet
       - solrnet

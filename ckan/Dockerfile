@@ -1,15 +1,24 @@
 FROM ckan/ckan-dev:2.11.3
 
 # Install any extensions needed by your CKAN instance
-# See Dockerfile.dev for more details and examples
+# See Dockerfile for more details and examples
+
+USER root
+
+# default user id and user group id
+ARG UID=1000
+ARG GID=1000
 
 # Install packages needed by official ckanext-scheming extension
-USER root
 RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt1-dev \
     libgeos-dev \
     && rm -rf /var/lib/apt/lists/*
+
+
+RUN groupmod -g "${GID}" ckan-sys && usermod -u "${UID}" -g "${GID}" ckan-sys
+
 
 # passwordless_api
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-passwordless_api.git@1.1.11#egg=ckanext-passwordless_api
@@ -50,7 +59,7 @@ COPY --chown=ckan-sys:ckan-sys docker-entrypoint.d/* /docker-entrypoint.d/
 # runtime mounted ones)
 COPY --chown=ckan-sys:ckan-sys patches ${APP_DIR}/patches
 
-USER ckan
+USER ckan-sys
 
 RUN for d in $APP_DIR/patches/*; do \
         if [ -d $d ]; then \
