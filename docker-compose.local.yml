@@ -30,6 +30,8 @@ services:
       dockerfile: Dockerfile
       args:
         - TZ=${TZ}
+        - "UID=${UID:-1000}"
+        - "GID=${GID:-1000}"
     networks:
       - ckannet
       - solrnet
@@ -43,6 +45,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    user: root
     volumes:
       - ckan_storage:/var/lib/ckan
       - pip_cache:/root/.cache/pip
