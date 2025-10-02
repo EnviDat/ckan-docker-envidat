@@ -203,10 +203,10 @@ if __name__ == "__main__":
         print("[prerun] Maintenance mode, skipping setup...")
     else:
         check_main_db_connection()
-        init_db()
+#        init_db()
         update_plugins()
-        check_datastore_db_connection()
-        init_datastore_db()
+#        check_datastore_db_connection()
+#        init_datastore_db()
         check_solr_connection()
-        create_sysadmin()
+#        create_sysadmin()
         
