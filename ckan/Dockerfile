@@ -34,7 +34,7 @@ RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-
 
 # restricted
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
-RUN chown -R ckan-sys:ckan-sys /var/lib/ckan/
+RUN chown -R ckan:ckan-sys /var/lib/ckan/
 RUN mkdir -p /var/lib/ckan/i18n
 
 # cloudstorage (used by "ckanext/envidat_theme/templates/scheming/package/resource_read.html" in ckanext-envidat_theme)
@@ -43,7 +43,7 @@ RUN pip install -r /srv/app/src/ckanext-cloudstorage/requirements.txt
 
 # blind_review
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-blind_review.git@2.0.0#egg=ckanext_blind_review
-RUN chown -R ckan-sys:ckan-sys /srv/app/
+RUN chown -R ckan:ckan-sys /srv/app/
 
 ########################################################################################
 # Copy custom initialization scripts
@@ -55,7 +55,8 @@ COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
 # runtime mounted ones)
 COPY --chown=ckan-sys:ckan-sys patches ${APP_DIR}/patches
 
-#USER ckan
+VOLUME /var/lib/ckan
+USER ckan
 
 RUN for d in $APP_DIR/patches/*; do \
         if [ -d $d ]; then \
