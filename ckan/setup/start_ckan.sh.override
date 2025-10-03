@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Add ckan.datapusher.api_token to the CKAN config file (updated with corrected value later)
 #ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
@@ -16,7 +16,7 @@ then
 fi
 
 # Run the prerun script to init CKAN and create the default admin user
-sudo -u ckan -EH python3 prerun.py
+python3 prerun.py
 
 #echo "Set up ckan.datapusher.api_token in the CKAN config file"
 #ckan config-tool $CKAN_INI "ckan.datapusher.api_token=$(ckan -c $CKAN_INI user token add ckan_admin datapusher | tail -n 1 | tr -d '\t')"
@@ -35,23 +35,24 @@ then
 fi
 
 # Set the common uwsgi options
+# prepare UWSGI_OPTS without hardcoded uid/gid
 UWSGI_OPTS="--plugins http,python \
             --socket /tmp/uwsgi.sock \
             --wsgi-file /srv/app/wsgi.py \
             --module wsgi:application \
-            --uid 92 --gid 92 \
             --http 0.0.0.0:5000 \
             --master --enable-threads \
             --lazy-apps \
             -p 2 -L -b 32768 --vacuum \
-            --harakiri $UWSGI_HARAKIRI"
+            --harakiri ${UWSGI_HARAKIRI:-60}"
 
-if [ $? -eq 0 ]
-then
-    # Start supervisord
-    supervisord --configuration /etc/supervisord.conf &
-    # Start uwsgi
-    sudo -u ckan -EH uwsgi $UWSGI_OPTS
+# If running as root, prefer running uwsgi as ckan via gosu.
+if [ "$(id -u)" -eq 0 ]; then
+    echo "*** Running as root: starting uWSGI as user 'ckan' (via gosu)"
+    exec gosu ckan uwsgi $UWSGI_OPTS
 else
-  echo "[prerun] failed...not starting CKAN."
+    echo "*** Running as UID $(id -u): starting uWSGI directly"
+    # If you previously added --uid/--gid, make sure they are not present when running non-root.
+    exec uwsgi $UWSGI_OPTS
 fi
+
