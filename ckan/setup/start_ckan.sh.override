@@ -34,9 +34,11 @@ then
     done
 fi
 
+#--wsgi-file /srv/app/wsgi.py 
+#--module wsgi:application
 # Define default UWSGI options
 DEFAULT_UWSGI_OPTS="--socket /tmp/uwsgi.sock \
-                    --module wsgi:application \
+                    --wsgi-file /srv/app/wsgi.py \
                     --chdir /srv/app/src/ckan \
                     --env CKAN_INI=/srv/app/ckan.ini \
                     --http :5000 \
