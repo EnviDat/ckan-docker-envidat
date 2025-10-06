@@ -37,10 +37,11 @@ fi
 # Define default UWSGI options
 DEFAULT_UWSGI_OPTS="--socket /tmp/uwsgi.sock \
                     --module wsgi:application \
-                    --http [::]:5000 \
+                    --chdir /srv/app/src/ckan \
+                    --env CKAN_INI=/srv/app/ckan.ini \
+                    --http :5000 \
                     --master --enable-threads \
-                    --lazy-apps \
-                    -p 2 -L -b 32768 --vacuum \
+                    --processes 2 --lazy-apps --vacuum \
                     --harakiri ${UWSGI_HARAKIRI:-60}"
 
 # Use UWSGI_OPTS from environment if set, otherwise use defaults
