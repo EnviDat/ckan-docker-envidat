@@ -33,7 +33,7 @@ RUN pip install -r /srv/app/src/ckanext-spatial/requirements.txt
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-composite.git@0.0.4#egg=ckanext-composite
 
 # restricted
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.0#egg=ckanext-restricted
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-restricted.git@1.0.1#egg=ckanext-restricted
 RUN chown -R ckan:ckan-sys /var/lib/ckan/
 RUN mkdir -p /var/lib/ckan/i18n
 
