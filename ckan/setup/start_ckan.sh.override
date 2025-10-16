@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Add ckan.datapusher.api_token to the CKAN config file (updated with corrected value later)
-#ckan config-tool $CKAN_INI ckan.datapusher.api_token=xxx
-
 # Set up the Secret key used by Beaker and Flask
 # This can be overriden using a CKAN___BEAKER__SESSION__SECRET env var
 if grep -qE "SECRET_KEY ?= ?$" ckan.ini
@@ -15,11 +12,12 @@ then
     ckan config-tool $CKAN_INI "api_token.jwt.decode.secret=${JWT_SECRET}"
 fi
 
-# Run the prerun script to init CKAN and create the default admin user
-python3 prerun.py
+# Fix ownership before anything CKAN-related runs
+chown -R ckan:ckan-sys /var/lib/ckan
 
-#echo "Set up ckan.datapusher.api_token in the CKAN config file"
-#ckan config-tool $CKAN_INI "ckan.datapusher.api_token=$(ckan -c $CKAN_INI user token add ckan_admin datapusher | tail -n 1 | tr -d '\t')"
+# Run prerun.py as ckan (important!)
+echo "[start_ckan.sh] Running prerun.py as ckan..."
+gosu ckan python3 prerun.py
 
 # Run any startup scripts provided by images extending this one
 if [[ -d "/docker-entrypoint.d" ]]
@@ -56,17 +54,10 @@ fi
 if [ $? -eq 0 ]
 then
     # Start uwsgi
-    uwsgi $UWSGI_OPTS
+    echo "[start_ckan.sh] Starting UWSGI as 'ckan'..."
+    exec gosu ckan uwsgi $UWSGI_OPTS
 else
   echo "[prerun] failed...not starting CKAN."
 fi
-# If running as root, prefer running uwsgi as ckan via gosu.
-#if [ "$(id -u)" -eq 0 ]; then
-#    echo "*** Running as root: starting uWSGI as user 'ckan' (via gosu)"
-#    exec gosu ckan uwsgi $UWSGI_OPTS
-#else
-#    echo "*** Running as UID $(id -u): starting uWSGI directly"
-#    # If you previously added --uid/--gid, make sure they are not present when running non-root.
-#    exec uwsgi $UWSGI_OPTS
-#fi
+
 

@@ -55,8 +55,7 @@ COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
 # runtime mounted ones)
 COPY --chown=ckan-sys:ckan-sys patches ${APP_DIR}/patches
 
-VOLUME /var/lib/ckan
-USER ckan
+#USER ckan
 
 RUN for d in $APP_DIR/patches/*; do \
         if [ -d $d ]; then \
