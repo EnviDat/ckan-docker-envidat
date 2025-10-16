@@ -56,7 +56,8 @@ fi
 if [ $? -eq 0 ]
 then
     # Start uwsgi
-    uwsgi $UWSGI_OPTS
+    echo "[start_ckan.sh] Starting UWSGI as 'ckan'..."
+    exec gosu ckan uwsgi $UWSGI_OPTS
 else
   echo "[prerun] failed...not starting CKAN."
 fi
