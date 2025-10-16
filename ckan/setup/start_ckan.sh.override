@@ -59,13 +59,5 @@ then
 else
   echo "[prerun] failed...not starting CKAN."
 fi
-# If running as root, prefer running uwsgi as ckan via gosu.
-#if [ "$(id -u)" -eq 0 ]; then
-#    echo "*** Running as root: starting uWSGI as user 'ckan' (via gosu)"
-#    exec gosu ckan uwsgi $UWSGI_OPTS
-#else
-#    echo "*** Running as UID $(id -u): starting uWSGI directly"
-#    # If you previously added --uid/--gid, make sure they are not present when running non-root.
-#    exec uwsgi $UWSGI_OPTS
-#fi
+
 
