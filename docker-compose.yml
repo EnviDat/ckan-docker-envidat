@@ -44,6 +44,7 @@ services:
         condition: service_healthy
     volumes:
       - ckan_storage:/var/lib/ckan
+      - ./ckan/envidat_licenses.json:/var/lib/ckan/envidat_licenses.json
       - pip_cache:/root/.cache/pip
       - site_packages:/usr/lib/python3.10/site-packages
     restart: unless-stopped
