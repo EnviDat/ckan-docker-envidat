@@ -55,7 +55,11 @@ COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
 # runtime mounted ones)
 COPY --chown=ckan-sys:ckan-sys patches ${APP_DIR}/patches
 
-#USER ckan
+# Create the /opt/ckan directory if it doesn’t exist
+RUN mkdir -p /opt/ckan
+# Copy your JSON file there
+COPY envidat_licenses.json /opt/ckan/envidat_licenses.json
+RUN chown -R ckan:ckan-sys /opt/ckan
 
 RUN for d in $APP_DIR/patches/*; do \
         if [ -d $d ]; then \
