@@ -1,5 +1,12 @@
-# Docker Compose setup for CKAN
+# ckan-docker-envidat
 
+## Notice
+* This EnviDat customized CKAN backend is a **modified copy** of the [ckan-docker](https://github.com/ckan/ckan-docker) repository.
+* **EnviDat modifications start after tag 0.1.0.** 
+* The first production release is the version tagged **1.0.0**.
+
+
+### Table of Contents
 
 - [Docker Compose setup for CKAN](#docker-compose-setup-for-ckan)
   - [1.  Overview](#1--overview)
@@ -25,13 +32,6 @@
   - [12. Changing the base image](#12-changing-the-base-image)
   - [13. Replacing DataPusher with XLoader](#13-replacing-datapusher-with-xloader)
   - [Copying and License](#copying-and-license)
-
-
-## NOTICE
-This EnviDat customized backend is a **modified copy** of the [ckan-docker](https://github.com/ckan/ckan-docker) repository. 
-
-**EnviDat modifications start after tag 0.1.0.** 
-
 
 ## 1.  Overview
 
