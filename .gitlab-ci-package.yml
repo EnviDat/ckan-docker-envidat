@@ -5,17 +5,16 @@
     GIT_STRATEGY: none
     REGCTL_CONFIG: $CI_PROJECT_DIR/.regctl/config.json
   before_script:
-    - export REG_HOST=${INTERNAL_REG%/*}
+    - export REG_HOST=${CI_REGISTRY}
     - mkdir -p "$(dirname "$REGCTL_CONFIG")"
     - >
       echo "{\"hosts\":{\"${REG_HOST}\":{\"tls\":\"enabled\",\"hostname\":
-      \"${REG_HOST}\",\"user\":\"${IMAGE_REGISTRY_USER}\",\"pass\":
-      \"${IMAGE_REGISTRY_PASS}\"}}}" >> $REGCTL_CONFIG
+      \"${REG_HOST}\",\"user\":\"${CI_DEPLOY_USER}\",\"pass\":
+      \"${CI_DEPLOY_PASSWORD}\"}}}" >> $REGCTL_CONFIG
   script:
     - >
       regctl --verbosity info image copy
       "${IMAGE_NAME}-unverified" "${IMAGE_NAME}"
-    - regctl tag delete "${IMAGE_NAME}-unverified" || echo "Tag already deleted"
 
 ckan-retag:
   needs:
