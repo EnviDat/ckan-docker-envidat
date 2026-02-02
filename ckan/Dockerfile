@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # passwordless_api
-RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-passwordless_api.git@1.1.11#egg=ckanext-passwordless_api
+# RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-passwordless_api.git@1.1.11#egg=ckanext-passwordless_api
+RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-passwordless_api.git@development#egg=ckanext-passwordless_api
 
 # scheming
 RUN pip install -e git+https://github.com/ckan/ckanext-scheming.git@release-3.1.0#egg=ckanext-scheming
