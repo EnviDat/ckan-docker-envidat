@@ -10,7 +10,7 @@ stages:
   - release
   - manual-deploy
 
-default:  
+default:
   tags:
     - backend
 
@@ -95,7 +95,7 @@ set-vars:
     - docker push "${IMAGE_NAME}-unverified"
 
 .build-rootless:
-  image: 
+  image:
     name: moby/buildkit:rootless
     entrypoint: [""]
   stage: build
@@ -105,7 +105,7 @@ set-vars:
     DOCKER_BUILDKIT: 1
     DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
     CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
-    #BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"    
+    #BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"
   before_script:
     - mkdir -p "$DOCKER_CONFIG"
     - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
@@ -159,15 +159,20 @@ remote-docker:
     # Create CKAN env file inside job container
     - echo "$CKAN_ENV" > .env
     - echo "$BUILD_ENV" > build.env
-    
+
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
-    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
+    - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
-    - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
+    - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
+    - chmod 600 ~/.ssh/config
+    - ssh-keyscan -H "$DEPLOY_HOSTNAME" >> ~/.ssh/known_hosts
+
+    # Safe connectivity check (no secrets)
+    - ssh -i ~/.ssh/gitlab -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "echo SSH_OK && whoami && hostname -f"
+
     # keep remote copy for debugging/auditing (not truly for the deployment)
-    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - scp -i ~/.ssh/gitlab -o IdentitiesOnly=yes .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull
@@ -190,7 +195,7 @@ manual-remote-docker:
       when: always
     - when: manual
   # for manual jobs add allow_failure so the whole pipeline won't show up as "blocked"
-  allow_failure: true    
+  allow_failure: true
   variables:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
     DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
@@ -207,12 +212,13 @@ manual-remote-docker:
 
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
-    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
+    - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
-    - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-    # keep remote copy for debugging/auditing (not truly for the deployment)
-    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
+    - chmod 600 ~/.ssh/config
+    - ssh-keyscan -H "$DEPLOY_HOSTNAME" >> ~/.ssh/known_hosts
+    - ssh -i ~/.ssh/gitlab -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "echo SSH_OK && whoami && hostname -f"
+    - scp -i ~/.ssh/gitlab -o IdentitiesOnly=yes .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull
