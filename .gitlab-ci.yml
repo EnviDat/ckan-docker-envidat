@@ -162,18 +162,12 @@ remote-docker:
 
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
-    - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
+    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - ssh-keygen -lf ~/.ssh/gitlab
-    - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
-    - chmod 600 ~/.ssh/config
-    - ssh-keyscan -H "$DEPLOY_HOSTNAME" >> ~/.ssh/known_hosts
-
-    # Safe connectivity check (no secrets)
-    - ssh -i ~/.ssh/gitlab -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "echo SSH_OK && whoami && hostname -f"
-
+    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
+    - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
     # keep remote copy for debugging/auditing (not truly for the deployment)
-    - scp -i ~/.ssh/gitlab -o IdentitiesOnly=yes .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull
@@ -213,14 +207,12 @@ manual-remote-docker:
 
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
-    - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
-    - ssh-keygen -lf ~/.ssh/gitlab
+    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
-    - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
-    - chmod 600 ~/.ssh/config
-    - ssh-keyscan -H "$DEPLOY_HOSTNAME" >> ~/.ssh/known_hosts
-    - ssh -i ~/.ssh/gitlab -o IdentitiesOnly=yes -o BatchMode=yes "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME" "echo SSH_OK && whoami && hostname -f"
-    - scp -i ~/.ssh/gitlab -o IdentitiesOnly=yes .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
+    - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
+    # keep remote copy for debugging/auditing (not truly for the deployment)
+    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull
