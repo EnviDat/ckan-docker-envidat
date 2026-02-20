@@ -164,6 +164,7 @@ remote-docker:
     - mkdir -p ~/.ssh
     - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
+    - ssh-keygen -lf ~/.ssh/gitlab
     - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
     - chmod 600 ~/.ssh/config
     - ssh-keyscan -H "$DEPLOY_HOSTNAME" >> ~/.ssh/known_hosts
@@ -213,6 +214,7 @@ manual-remote-docker:
     # SSH setup for DOCKER_HOST=ssh://
     - mkdir -p ~/.ssh
     - printf "%s\n" "$DEPLOY_SSH_KEY" > ~/.ssh/gitlab
+    - ssh-keygen -lf ~/.ssh/gitlab
     - chmod 400 ~/.ssh/gitlab
     - printf "Host *\n  IdentityFile ~/.ssh/gitlab\n  IdentitiesOnly yes\n" > ~/.ssh/config
     - chmod 600 ~/.ssh/config
