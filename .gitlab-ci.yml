@@ -197,6 +197,7 @@ manual-remote-docker:
   before_script:
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is ${CKAN_VERSION}"
+    - echo "***The hostname is ${DEPLOY_HOSTNAME}"
     # Create Docker config dir inside job container
     - mkdir -p "$DOCKER_CONFIG"
     - echo "$DOCKER_AUTH_CONFIG" > "$DOCKER_CONFIG/config.json"
