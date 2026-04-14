@@ -150,6 +150,9 @@ remote-docker:
     DOCKER_HOST: "ssh://$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME"
     DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker"
   before_script:
+    # Test connection to remote server
+    - ssh -o BatchMode=yes -o ConnectTimeout=5 $DEPLOY_SSH_USER@$DEPLOY_HOSTNAM uptime
+
     - echo "***The app image is   ${IMAGE_NAME}"
     - echo "***The app version is ${CKAN_VERSION}"
     # Create Docker config dir inside job container
