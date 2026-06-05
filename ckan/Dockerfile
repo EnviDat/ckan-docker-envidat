@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # status POC
-RUN pip install -e git+https://gitlabext.wsl.ch/waldecky/ckanext-status.git
+RUN pip install -e git+https://gitlabext.wsl.ch/waldecky/ckanext-status.git@0.1.0#egg=ckanext-status
 
 # passwordless_api
 RUN pip install -e git+https://gitlabext.wsl.ch/EnviDat/ckan_extensions/ckanext-passwordless_api.git@1.1.11#egg=ckanext-passwordless_api
