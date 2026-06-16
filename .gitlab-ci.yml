@@ -166,12 +166,8 @@ remote-docker:
     - chmod 400 ~/.ssh/gitlab
     - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
-
-    # Test connection to remote server
-    - ssh -o BatchMode=yes -o ConnectTimeout=5 $DEPLOY_SSH_USER@$DEPLOY_HOSTNAME uptime
-
     # keep remote copy for debugging/auditing (not truly for the deployment)
-    # - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull
@@ -216,7 +212,7 @@ manual-remote-docker:
     - echo "IdentityFile ~/.ssh/gitlab" > ~/.ssh/config
     - ssh-keyscan -H $DEPLOY_HOSTNAME >> ~/.ssh/known_hosts
     # keep remote copy for debugging/auditing (not truly for the deployment)
-    # - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
+    - scp .env "$DEPLOY_SSH_USER@$DEPLOY_HOSTNAME:/home/$DEPLOY_SSH_USER/.env"
   script:
     # All docker commands below run on remote host, thanks to DOCKER_HOST
     - docker compose --project-name=$APP_NAME --env-file build.env pull

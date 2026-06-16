@@ -14,7 +14,6 @@ services:
     networks:
       - webnet
       - ckannet
-      - gatekeeper-ckan-proxy
     environment:
       - AUTH_COOKIE_NAME=envidat
     depends_on:
@@ -79,5 +78,3 @@ networks:
     internal: true
   redisnet:
     internal: true
-  gatekeeper-ckan-proxy:
-    external: true
