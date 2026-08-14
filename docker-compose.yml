@@ -73,15 +73,16 @@ services:
 
   ckan-worker: #needed to have queue work/have cron jobs
     image: "${CKAN_IMAGE}"
-    entrypoint: [ "/bin/bash", "-c" ]
-    command: #not sure if that works now <.<
-      - |
-        /srv/app/prerun.py &&
-        exec ckan -c /srv/app/ckan.ini jobs worker
+    command: ["ckan", "-c", "/srv/app/ckan.ini", "jobs", "worker"] #not sure if that works <.<
     env_file:
       - .env #same as ckan
+    networks: #sameas ckan
+      - ckannet
+      - solrnet
+      - redisnet
     depends_on:
-      - redis
+      - redis:
+          condition: service_healthy
     restart: unless-stopped
     volumes: #same as ckan
       - ckan_storage:/var/lib/ckan
