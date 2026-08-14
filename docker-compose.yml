@@ -70,7 +70,20 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
-    
+
+  ckan-worker: #needed to have queue work/have cron jobs
+    image: "${CKAN_IMAGE}"
+    command: ["ckan", "-c", "/srv/app/ckan.ini", "jobs", "worker"] #not sure if that works <.<
+    env_file:
+      - .env #same as ckan
+    depends_on:
+      - redis
+    restart: unless-stopped
+    volumes: #same as ckan
+      - ckan_storage:/var/lib/ckan
+      - pip_cache:/root/.cache/pip
+      - site_packages:/usr/lib/python3.10/site-packages
+
 networks:
   webnet:
   ckannet:
