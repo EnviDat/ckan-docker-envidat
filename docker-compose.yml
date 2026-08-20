@@ -78,7 +78,7 @@ services:
       dockerfile: Dockerfile
       args:
         - TZ=${TZ}
-    command: ["ckan", "-c", "/srv/app/ckan.ini", "jobs", "worker"]
+    command: ["/bin/bash", "-c", "gosu ckan python3 prerun.py && exec gosu ckan ckan -c /srv/app/ckan.ini jobs worker"]
     networks:
       - ckannet
       - solrnet
