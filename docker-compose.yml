@@ -73,7 +73,7 @@ services:
 
   ckan-worker: #needed to have queue work/have cron jobs
     image: "${CKAN_IMAGE}"
-    command: ["ckan", "-c", "/srv/app/ckan.ini", "jobs", "worker"] #not sure if that works <.<
+    command: ["/bin/bash", "-c", "ckan -c /srv/app/ckan.ini jobs worker"]#not sure if that works <.<
     env_file:
       - .env #same as ckan
     networks: #sameas ckan
