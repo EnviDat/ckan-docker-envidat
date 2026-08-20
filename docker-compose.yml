@@ -78,21 +78,24 @@ services:
       dockerfile: Dockerfile
       args:
         - TZ=${TZ}
-    command: ["/bin/bash", "-c", "ckan -c /srv/app/ckan.ini jobs worker"]#not sure if that works <.<
-    env_file:
-      - .env #same as ckan
-    networks: #sameas ckan
+    command: ["ckan", "-c", "/srv/app/ckan.ini", "jobs", "worker"]
+    networks:
       - ckannet
       - solrnet
       - redisnet
+    env_file:
+      - .env
     depends_on:
+      solr:
+        condition: service_healthy
       redis:
         condition: service_healthy
-    restart: unless-stopped
-    volumes: #same as ckan
+    volumes:
       - ckan_storage:/var/lib/ckan
       - pip_cache:/root/.cache/pip
       - site_packages:/usr/lib/python3.10/site-packages
+    restart: unless-stopped
+
 
 networks:
   webnet:
