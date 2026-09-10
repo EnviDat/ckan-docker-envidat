@@ -70,7 +70,33 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-e", "QUIT"]
-    
+
+  ckan-worker: #needed to have queue work/have cron jobs
+    image: "${CKAN_IMAGE}"
+    build:
+      context: ckan/
+      dockerfile: Dockerfile
+      args:
+        - TZ=${TZ}
+    command: ["/bin/bash", "-c", "gosu ckan python3 prerun.py && exec gosu ckan ckan -c /srv/app/ckan.ini jobs worker"]
+    networks:
+      - ckannet
+      - solrnet
+      - redisnet
+    env_file:
+      - .env
+    depends_on:
+      solr:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ckan_storage:/var/lib/ckan
+      - pip_cache:/root/.cache/pip
+      - site_packages:/usr/lib/python3.10/site-packages
+    restart: unless-stopped
+
+
 networks:
   webnet:
   ckannet:
